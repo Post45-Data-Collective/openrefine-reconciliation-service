@@ -11,8 +11,9 @@ from lib.strategies_google_books import process_google_books_work_query
 from lib.strategies_oclc import process_oclc_query
 from lib.strategies_viaf import process_viaf_query
 
-from lib.strategies_id_loc_gov import extend_data
+from lib.strategies_id_loc_gov import extend_data as extend_data_id
 
+from lib.strategies_viaf import extend_data as extend_data_viaf
 
 
 
@@ -137,17 +138,20 @@ def return_manifest():
 
         if 'extend' in request.form:
 
+
             extend_req = json.loads(request.form['extend'])
 
-            return extend_data(extend_req['ids'],extend_req['properties'])
+
+            if 'ids' in extend_req:
+                if len(extend_req['ids'])>0:
+                    if "id.loc.gov" in extend_req['ids'][0]:
+                        return extend_data_id(extend_req['ids'],extend_req['properties'])
+                    elif "viaf.org" in extend_req['ids'][0]:
+                        return extend_data_viaf(extend_req['ids'],extend_req['properties'])
+                    else:
+                        return ""
 
 
-
-        # if has_body == True:
-        #     print(post_data)
-        # else:
-        #     print("No json!")
-        #     print(request.data)
 
         
         return manifest

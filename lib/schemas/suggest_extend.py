@@ -39,10 +39,18 @@ extend_values_Google_Books = {
       "name": "Language"
     },
 
+  ]
+}
 
 
-
-
+extend_values_VIAF = {
+  "limit": 10,
+  "type": "VIAF_Personal",
+  "properties": [
+    {
+      "id": "wikidata",
+      "name": "Wikidata"
+    }
 
   ]
 }
@@ -55,6 +63,8 @@ def suggest_extend(query):
         return extend_values_LC_Work_Id
     if query == 'Google_Books':
         return extend_values_Google_Books
+    if query == 'VIAF_Personal':
+        return extend_values_VIAF
 
 
     return None

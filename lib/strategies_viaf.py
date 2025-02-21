@@ -1,6 +1,8 @@
 import requests
 import html
 import json
+import re
+import os
 from .strategies_helpers import _build_recon_dict
 from .strategies_helpers import _build_recon_dict_name
 from .strategies_helpers import normalize_string
@@ -215,5 +217,93 @@ def _parse_name_results(result,reconcile_item):
 	return result
 
 
+
+def extend_data(ids,properties):
+	"""
+		Sent Ids and proeprties it talks to viaf and returns the reuqested values
+	"""
+
+	response = {"meta":[],"rows":{}}
+
+	for p in properties:
+
+		if p['id'] == 'wikidata':
+			response['meta'].append({"id":"wikidata",'name':'Wikidata'})
+		# if p['id'] == 'LCCN':
+		# 	response['meta'].append({"id":"LCCN",'name':'LCCN'})
+		# if p['id'] == 'OCLC':
+		# 	response['meta'].append({"id":"OCLC",'name':'OCLC'})
+
+
+	for i in ids:
+
+		response['rows'][i]={}
+
+		for p in properties:
+
+			if p['id'] == 'wikidata':
+
+				# load it from the cache
+				passed_id_escaped = i.replace(":",'_').replace("/",'_')
+				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+
+					allQids = re.findall(r"WKP\|Q[0-9]{2,}", json.dumps(data))
+
+					if len(allQids) > 0:
+						response['rows'][i]['wikidata'] = [{'str':allQids[0].split("|")[1]}]
+					else:
+						response['rows'][i]['wikidata'] = [{}]
+
+
+
+		# instance_response = None
+		# work_response = None
+
+		# response['rows'][i]={}
+
+		# if '/works/' in i:
+
+		# 	for p in properties:
+
+		# 		if p['id'] == 'ISBN':
+
+		# 			if instance_response == None:
+		# 				instance_response = requests.get(i.replace('/works/','/instances/')+'.bibframe.json')
+
+
+		# 			value = _extend_extract_ISBN(instance_response)
+		# 			print("valuevaluevaluevalue _extend_extract_ISBN",value)
+
+		# 			response['rows'][i]['ISBN'] = value
+
+		# 		if p['id'] == 'LCCN':
+
+		# 			if instance_response == None:
+		# 				instance_response = requests.get(i.replace('/works/','/instances/')+'.bibframe.json')
+
+
+		# 			value = _extend_extract_LCCN(instance_response)
+		# 			print("valuevaluevaluevalue _extend_extract_LCCN",value)
+		# 			response['rows'][i]['LCCN'] = value
+
+		# 		if p['id'] == 'OCLC':
+
+		# 			if instance_response == None:
+		# 				instance_response = requests.get(i.replace('/works/','/instances/')+'.bibframe.json')
+
+
+		# 			value = _extend_extract_OCLC(instance_response)
+		# 			print("valuevaluevaluevalue _extend_extract_OCLC",value)
+		# 			response['rows'][i]['OCLC'] = value
+
+
+
+
+
+	print(properties)
+	print(response)
+	print(json.dumps(response,indent=2))
+	return response
 
 
