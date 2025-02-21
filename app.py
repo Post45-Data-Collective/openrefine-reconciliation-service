@@ -224,18 +224,90 @@ def view_preview():
             <div><a href="{data['uri']}" target="_blank">Link</a></div>
             <div>{too_add}</div>
 
-            
+            """
 
+    if 'viaf.org' in passed_id:
+
+        passed_id_escaped = passed_id.replace(":",'_').replace("/",'_')
+        if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+            data = json.load(open(f'data/cache/{passed_id_escaped}'))
+
+            name_type = ""
+            names = []
+            titles = []
+
+            if 'recordData' in data:
+                if 'VIAFCluster' in data['recordData']:
+                    if 'mainHeadings' in data['recordData']['VIAFCluster']:
+                        if 'data' in data['recordData']['VIAFCluster']['mainHeadings']:
+
+                            for d in data['recordData']['VIAFCluster']['mainHeadings']['data']:
+                                names.append(d['text'])
+
+                    if 'titles' in data['recordData']['VIAFCluster']:
+                        if 'work' in data['recordData']['VIAFCluster']['titles']:
+                            for w in data['recordData']['VIAFCluster']['titles']['work']:
+                                titles.append(w['title'])
+
+                    if 'nameType' in data['recordData']['VIAFCluster']:
+                        name_type = data['recordData']['VIAFCluster']['nameType']
+
+                        
+
+                        
+
+
+            html = ""
+
+            html = html + 'Type: ' + name_type
+
+
+
+
+            too_add = "<ul>"
+            for nl in names:
+                too_add = too_add + '<li>'+ nl +'</li>'
+            too_add = too_add + "</ul>"
+
+            too_add2 = "<ul>"
+
+            for t in titles:
+                too_add2 = too_add2 + '<li>'+ t +'</li>'
+            too_add2 = too_add2 + "</ul>"
+
+
+
+            html = html + f"""
+
+                <div style="display:flex">
+                    <div style="flex:1">{too_add}</div>
+                    <div style="flex:1">{too_add2}</div>
+                </div>
 
 
             """
 
-            print(data) 
+
+
+            # if 'more' in data:
+            #     if 'rdftype' in data['more']:
+            #         if data['more']['rdftype'] != '':
+            #             too_add = too_add + f"<li>Type: {data['more']['rdftype']}</li>"
+
+
+            # html = f"""
+            # <h2>{data['aLabel']}</h2>
+            # <div>{data['vLabel']}</div>
+
+            # <div><a href="{data['uri']}" target="_blank">Link</a></div>
+            # <div>{too_add}</div>
+
+            # """
 
 
 
 
-    return f"<html><body>{html}</body></html>"
+    return f"<html><body style=\"font-size:12px;\">{html}</body></html>"
     # if 'id.loc.gov' in passed_id:
     #     return redirect(passed_id, code=302)
 
