@@ -1,3 +1,10 @@
+from os import environ
+
+use_endpoint_address = "http://127.0.0.1:5000"
+if environ.get('OR_IP') is not None:
+  use_endpoint_address = environ.get('OR_IP')
+
+
 manifest = {
   "versions": ["0.2"],
   "defaultTypes": [
@@ -31,24 +38,24 @@ manifest = {
   "batchSize": 1,
   "preview": {
     "height": 200,
-    "url": "http://127.0.0.1:5000/api/v1/preview?id={{id}}",
+    "url": use_endpoint_address + "/api/v1/preview?id={{id}}",
     "width": 500
   },
 
   "view": {
-    "url": "http://127.0.0.1:5000/api/v1/redirect?id={{id}}"
+    "url": use_endpoint_address + "/api/v1/redirect?id={{id}}"
   },
 
   "suggest": {
     "property": {
-      "service_url": "http://127.0.0.1:5000/api/v1/reconcile",
+      "service_url": use_endpoint_address + "/api/v1/reconcile",
       "service_path": "/suggest/property"
     },
 
   },
   "extend": {
     "propose_properties": {
-      "service_url": "http://127.0.0.1:5000/api/v1/reconcile",
+      "service_url": use_endpoint_address + "/api/v1/reconcile",
       "service_path": "/extend_suggest"
     }
   }
