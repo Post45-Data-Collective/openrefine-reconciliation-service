@@ -2,3 +2,5 @@
 
 # openrefine-reconciliation-service
 Openrefine 0.2 reconciliation service
+
+Extremely temporary test endpoint: `http://164.92.77.151/api/v1/reconcile`
