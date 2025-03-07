@@ -3,6 +3,8 @@ import html
 import json
 import re
 import os
+from thefuzz import fuzz
+
 from .strategies_helpers import _build_recon_dict
 from .strategies_helpers import _build_recon_dict_name
 from .strategies_helpers import normalize_string
@@ -150,8 +152,18 @@ def _parse_name_results(result,reconcile_item):
 
 
 
+		score = 0.25
 
-		score = 0.5
+		# do basic string comparsions to add to the base score
+		# no added info passed we should do some basic fuzzy string comparisons 
+		reconcile_item_name_normalized = normalize_string(reconcile_item['name'])
+		hit_name_normalize = normalize_string(authLabel)		
+		score = score + fuzz.ratio(reconcile_item_name_normalized, hit_name_normalize) / 100 - 0.5
+
+
+
+
+
 
 		# go through and see if we were passed a title does it match one on file
 		if 'title' in reconcile_item:
@@ -177,6 +189,14 @@ def _parse_name_results(result,reconcile_item):
 						score = 1						
 						break
 
+		if 'birth_year' in reconcile_item:
+			if reconcile_item['birth_year'] != False:
+
+				# if the birth year is in the string and the fuzz match is close then set it to 1
+
+				if (fuzz.ratio(reconcile_item_name_normalized, hit_name_normalize) >= 65):
+					if reconcile_item['birth_year'] in authLabel:
+						score = 1
 
 
 		data = {
@@ -187,6 +207,7 @@ def _parse_name_results(result,reconcile_item):
 			'score':score
 		}
 
+		print(data)
 
 		## put it in the cache for later if we need to generate a preview flyout for it
 		file_name = uri.replace(':','_').replace('/','_')

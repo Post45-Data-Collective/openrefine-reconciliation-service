@@ -19,6 +19,11 @@ suggest_property = {
               "name": "Associated Title'",
               "description": "Title of work connected to the name reconciling",
               "id": "title"
+            },
+            {
+              "name": "Birth Year'",
+              "description": "Birth year of the person",
+              "id": "birth_year"
             }
 
 

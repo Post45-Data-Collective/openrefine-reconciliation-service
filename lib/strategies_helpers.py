@@ -1,5 +1,7 @@
 import unicodedata
 import string
+import re
+
 
 def _build_recon_dict(recon_query):
 
@@ -29,6 +31,7 @@ def _build_recon_dict_name(recon_query):
 	reconcile_item = {
 		'name': recon_query['query'],
 		'title': False,
+		'birth_year': False,
 		'type': recon_query['type'],
 	}
 
@@ -36,10 +39,23 @@ def _build_recon_dict_name(recon_query):
 		for prop in recon_query['properties']:
 			if prop['pid'] == 'title':
 				reconcile_item['title'] = _build_title_for_uncontrolled_name_search(prop['v'])
+			if prop['pid'] == 'birth_year':
+				reconcile_item['birth_year'] = _build_birth_year_name_search(prop['v'])
 
 
 	return reconcile_item
 
+
+
+
+def _build_birth_year_name_search(years):
+
+	all_years = re.findall("[0-9]{4}",years)
+
+	if len(all_years) > 0:
+		return all_years[0]
+	else:
+		return False
 
 
 def _build_title_for_uncontrolled_name_search(title):
@@ -56,6 +72,9 @@ def _build_title_for_uncontrolled_name_search(title):
 
 
 
+
+
+
 # from thefuzz import fuzz
 
 
@@ -66,5 +85,5 @@ def normalize_string(s):
     s = s.lower()
     s = s.casefold()
     s = ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
-    s = s.replace('the','')
+    s = s.replace('the ','')
     return s
