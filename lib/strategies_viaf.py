@@ -140,7 +140,7 @@ def _parse_name_results(result,reconcile_item):
 		if 'mainHeadings' in a_hit["recordData"]["VIAFCluster"]:
 			if 'data' in a_hit["recordData"]["VIAFCluster"]['mainHeadings']:
 				if len(a_hit["recordData"]["VIAFCluster"]['mainHeadings']['data']) > 0:
-					authLabel = a_hit["recordData"]["VIAFCluster"]['mainHeadings']['data'][0]['text']
+					authLabel = html.unescape(str(a_hit["recordData"]["VIAFCluster"]['mainHeadings']['data'][0]['text']))
 
 
 		# titles are titles the name is connected to
@@ -148,7 +148,8 @@ def _parse_name_results(result,reconcile_item):
 		if 'titles' in a_hit["recordData"]["VIAFCluster"]:
 			if 'work' in a_hit["recordData"]["VIAFCluster"]['titles']:
 				for work in a_hit["recordData"]["VIAFCluster"]['titles']['work']:
-					titles.append(html.unescape(work['title']))
+
+					titles.append(html.unescape(str(work['title'])))
 
 
 

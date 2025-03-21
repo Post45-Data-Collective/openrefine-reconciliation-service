@@ -105,15 +105,19 @@ def return_manifest():
         
 
 
-        try:
-            if 'queries' in request.form:
+        # try:
+        if 'queries' in request.form:
 
 
 
-                query = json.loads(request.form['queries'])
+            query = json.loads(request.form['queries'])
 
 
-                for queryId in query:
+            for queryId in query:
+
+                if 'type' in query[queryId]:
+                        
+
                     if query[queryId]['type'] == 'LC_Work_Id':
                         return process_id_loc_gov_work_query(query)
                         break
@@ -134,9 +138,9 @@ def return_manifest():
 
 
 
-        except Exception as e: 
-            print(e)
-            pass
+        # except Exception as e: 
+        #     print(e)
+        #     pass
 
 
         if 'extend' in request.form:
