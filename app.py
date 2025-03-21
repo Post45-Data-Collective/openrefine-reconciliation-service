@@ -15,6 +15,9 @@ from lib.strategies_id_loc_gov import extend_data as extend_data_id
 
 from lib.strategies_viaf import extend_data as extend_data_viaf
 
+from lib.strategies_oclc import extend_data as extend_data_worldcat
+
+from lib.strategies_google_books import extend_data as extend_data_google
 
 
 
@@ -27,11 +30,11 @@ import pathlib
 
 
 
+ 
 
-
-
-OCLC_CLIENT_ID = None
-OCLC_SECRET = None
+# if the oclc keys are available as env vars
+OCLC_CLIENT_ID = os.environ.get('OCLC_CLIENT_ID', None) 
+OCLC_SECRET = os.environ.get('OCLC_SECRET', None) 
 
 
 
@@ -141,13 +144,22 @@ def return_manifest():
 
             extend_req = json.loads(request.form['extend'])
 
-
             if 'ids' in extend_req:
                 if len(extend_req['ids'])>0:
                     if "id.loc.gov" in extend_req['ids'][0]:
                         return extend_data_id(extend_req['ids'],extend_req['properties'])
                     elif "viaf.org" in extend_req['ids'][0]:
                         return extend_data_viaf(extend_req['ids'],extend_req['properties'])
+                    elif "worldcat.org" in extend_req['ids'][0]:
+                        return extend_data_worldcat(extend_req['ids'],extend_req['properties'])
+                    elif "googleapis.com" in extend_req['ids'][0]:
+                        return extend_data_google(extend_req['ids'],extend_req['properties'])
+
+
+
+
+
+
                     else:
                         return ""
 
@@ -308,6 +320,57 @@ def view_preview():
 
             # """
 
+    if 'worldcat.org' in passed_id:
+        
+        html = ""
+
+
+        passed_id_escaped = passed_id.replace(":",'_').replace("/",'_')
+        if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+            data = json.load(open(f'data/cache/{passed_id_escaped}'))
+
+            titles = []
+
+            if 'title' in data:
+                if 'mainTitles' in data['title']:
+                    if len(data['title']['mainTitles']) > 0:
+                        for t in data['title']['mainTitles']:
+                            if 'text' in t:
+                                titles.append(t['text'])
+
+
+            too_add = "<ul>"
+            for t in titles:
+                too_add = too_add + '<li>Title: '+ t +'</li>'
+
+
+            if 'classification' in data:
+                if 'dewey' in data['classification']:
+                    too_add = too_add + '<li>Dewey: '+ data['classification']['dewey'] +'</li>'
+                if 'lc' in data['classification']:
+                    too_add = too_add + '<li>LCC: '+ data['classification']['lc'] +'</li>'
+
+
+            if 'date' in data:
+                if 'publicationDate' in data['date']:
+
+                    too_add = too_add + '<li>Pub Date: '+ data['date']['publicationDate'] +'</li>'
+
+
+
+
+            too_add = too_add + "</ul>"
+
+
+            html = html + f"""
+
+                <div style="display:flex">
+                    <div style="flex:1">{too_add}</div>
+                    <div style="flex:1"></div>
+                </div>
+
+
+            """
 
 
 

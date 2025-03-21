@@ -55,6 +55,23 @@ extend_values_VIAF = {
   ]
 }
 
+extend_values_Worldcat = {
+  "limit": 10,
+  "type": "OCLC_Record",
+  "properties": [
+    {
+      "id": "isbn_cluster",
+      "name": "ISBN Cluster"
+    },
+    {
+      "id": "dewey",
+      "name": "Dewey (DDC)"
+    }    
+
+  ]
+}
+
+
 
 
 def suggest_extend(query):
@@ -65,7 +82,8 @@ def suggest_extend(query):
         return extend_values_Google_Books
     if query == 'VIAF_Personal':
         return extend_values_VIAF
-
+    if query == 'OCLC_Record':
+        return extend_values_Worldcat
 
     return None
 

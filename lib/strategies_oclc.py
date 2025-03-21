@@ -1,9 +1,12 @@
 import requests
 import time
-
+import json
+import os
+import glob
 from .strategies_helpers import _build_recon_dict
 
 
+extend_work_mapping = {}
 
 
 headers = {}
@@ -27,6 +30,7 @@ def reauth(OCLC_CLIENT_ID, OCLC_SECRET):
 		auth=(OCLC_CLIENT_ID,OCLC_SECRET),
 	)
 	print(response.text)
+
 	token = response.json()["access_token"]
 	auth_timestamp = time.time()
 
@@ -113,7 +117,8 @@ def _search_title(title,name):
 	url = f'https://americas.discovery.api.oclc.org/worldcat/search/v2/bibs'
 
 	params = {
-		'q': f'au:{name} AND ti:{title}'
+		'q': f'au:{name} AND ti:{title}',
+		'limit': 50
 	}
 
 	print("Doing", url)
@@ -167,6 +172,15 @@ def _parse_title_results(result,title,author):
 	# 	last = reconcile_item['contributor_uncontrolled_first_last'].split(',')[1].strip().split(' ')[0]
 	# 	first = reconcile_item['contributor_uncontrolled_first_last'].split(',')[0].strip().split(' ')[0]
 
+	safe_title = "".join(c for c in title if c.isalpha() or c.isdigit() or c==' ').rstrip()
+	safe_author = "".join(c for c in author if c.isalpha() or c.isdigit() or c==' ').rstrip()
+
+	safe_title = "".join(safe_title.split())
+	safe_author = "".join(safe_author.split())
+
+	with open(f'data/cache/worldcat_search_{safe_title}_{safe_author}','w') as out:
+		json.dump(result['bibRecords'],out)
+
 
 	result['or_query_response'] = []
 
@@ -193,6 +207,13 @@ def _parse_title_results(result,title,author):
 					if 'text' in a_hit['title']['mainTitles'][0]:
 						title = a_hit['title']['mainTitles'][0]['text']
 
+		uri = 'https://worldcat.org/oclc/' + oclc
+
+		file_name = uri.replace(':','_').replace('/','_')
+		with open(f'data/cache/{file_name}','w') as out:
+			json.dump(a_hit,out)
+
+
 		result['or_query_response'].append(
 			{
 				"id": 'https://worldcat.org/oclc/' + oclc,
@@ -213,6 +234,121 @@ def _parse_title_results(result,title,author):
 
 	return result
 
+def _build_extend_work_mapping():
+	global extend_work_mapping
 
+	for file in glob.glob('data/cache/worldcat_search_*'):
+		print(file)
+		data = json.load(open(file))
+
+		
+		for record in data:
+
+			work_id=None
+			if 'work' in record:
+				if 'id' in record['work']:
+					work_id = record['work']['id']
+					print(work_id)
+
+			if work_id != None:
+				isbns = []
+				if 'identifier' in record:
+					if 'isbns' in record['identifier']:
+
+						if isinstance(record['identifier']['isbns'], list) == False:
+							record['identifier']['isbns'] = [record['identifier']['isbns']]
+
+						isbns = isbns + record['identifier']['isbns']
+
+
+
+				if work_id not in extend_work_mapping: 
+					extend_work_mapping[work_id] = []
+
+				extend_work_mapping[work_id]= extend_work_mapping[work_id] + isbns
+
+				extend_work_mapping[work_id] = list(set(extend_work_mapping[work_id]))
+				print(extend_work_mapping[work_id])
+
+
+	print("Building")
+	print(extend_work_mapping)
+
+
+def extend_data(ids,properties):
+	global extend_work_mapping
+
+
+	"""
+		Sent Ids and proeprties it talks to viaf and returns the reuqested values
+	"""
+
+
+	response = {"meta":[],"rows":{}}
+
+	for p in properties:
+
+		if p['id'] == 'dewey':
+			response['meta'].append({"id":"dewey",'name':'Dewey (DDC)'})
+		if p['id'] == 'isbn_cluster':
+			response['meta'].append({"id":"isbn_cluster",'name':'ISBN Cluster'})
+
+
+	for i in ids:
+
+		response['rows'][i]={}
+
+		for p in properties:
+
+			if p['id'] == 'dewey':
+
+				# load it from the cache
+				passed_id_escaped = i.replace(":",'_').replace("/",'_')
+				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+
+					dewey = ""
+					if 'classification' in data:
+						if 'dewey' in data['classification']:
+							dewey = data['classification']['dewey']
+
+
+					if len(dewey) > 0:
+						response['rows'][i]['dewey'] = [{'str':dewey}]
+					else:
+						response['rows'][i]['dewey'] = [{}]
+
+			if p['id'] == 'isbn_cluster':
+
+				passed_id_escaped = i.replace(":",'_').replace("/",'_')
+				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+
+					if 'work' in data:
+						if 'id' in data['work']:
+							work_id = data['work']['id']
+
+
+							# is the work id already in the mapping?
+							if work_id in extend_work_mapping:
+
+								response['rows'][i]['isbn_cluster'] = [{'str':"|".join(extend_work_mapping[work_id])}]
+
+							else:
+
+								_build_extend_work_mapping()
+								if work_id in extend_work_mapping:
+									response['rows'][i]['isbn_cluster'] = [{'str':"|".join(extend_work_mapping[work_id])}]
+								else:
+									response['rows'][i]['isbn_cluster'] = [{}]
+
+
+
+
+
+	print(properties)
+	print(response)
+	print(json.dumps(response,indent=2))
+	return response
 
 

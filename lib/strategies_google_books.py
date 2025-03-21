@@ -1,4 +1,6 @@
 import requests
+import os
+import json
 
 from .strategies_helpers import _build_recon_dict
 
@@ -333,6 +335,12 @@ def _parse_title_results(result,title,author):
 
 	for a_hit in result['items']:
 
+		uri = 'https://www.googleapis.com/books/v1/volumes/' + a_hit['id']
+		file_name = uri.replace(':','_').replace('/','_')
+		with open(f'data/cache/{file_name}','w') as out:
+			json.dump(a_hit,out)
+
+
 		# if it was in the response from the server that means it matched something, so give it a basline score
 		score = 0.5
 		print("----a_hit-----")
@@ -344,6 +352,9 @@ def _parse_title_results(result,title,author):
 
 		# if the last name is not the first thing in AAP then we got a problem
 		# TODO
+
+
+
 
 
 		result['or_query_response'].append(
@@ -367,5 +378,142 @@ def _parse_title_results(result,title,author):
 	return result
 
 
+
+
+
+
+
+def extend_data(ids,properties):
+	"""
+		Sent Ids and proeprties it talks to viaf and returns the reuqested values
+	"""
+
+	response = {"meta":[],"rows":{}}
+
+	for p in properties:
+
+		if p['id'] == 'ISBN':
+			response['meta'].append({"id":"ISBN",'name':'ISBN'})
+		if p['id'] == 'description':
+			response['meta'].append({"id":"description",'name':'Description'})
+
+		if p['id'] == 'pageCount':
+			response['meta'].append({"id":"pageCount",'name':'Page Count'})
+
+		if p['id'] == 'language':
+			response['meta'].append({"id":"language",'name':'Language'})
+
+
+
+
+		# if p['id'] == 'LCCN':
+		# 	response['meta'].append({"id":"LCCN",'name':'LCCN'})
+		# if p['id'] == 'OCLC':
+		# 	response['meta'].append({"id":"OCLC",'name':'OCLC'})
+
+
+	for i in ids:
+
+		response['rows'][i]={}
+
+		for p in properties:
+
+			if p['id'] == 'ISBN':
+
+				# load it from the cache
+				passed_id_escaped = i.replace(":",'_').replace("/",'_')
+				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+					
+					isbns = []
+
+					if 'volumeInfo' in data:
+						if 'industryIdentifiers' in data['volumeInfo']:
+
+							for ident in data['volumeInfo']['industryIdentifiers']:
+								if 'type' in ident:
+									if 'ISBN' in ident['type']:
+										isbns.append(ident['identifier'])
+
+
+
+
+					if len(isbns) > 0:
+						response['rows'][i]['ISBN'] = [{'str':"|".join(isbns)}]
+					else:
+						response['rows'][i]['ISBN'] = [{}]
+
+			if p['id'] == 'description':
+
+				# load it from the cache
+				passed_id_escaped = i.replace(":",'_').replace("/",'_')
+				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+					
+					description = ""
+
+					if 'volumeInfo' in data:
+						if 'description' in data['volumeInfo']:
+
+							description = data['volumeInfo']['description']
+
+
+					if len(description) > 0:
+						response['rows'][i]['description'] = [{'str':description}]
+					else:
+						response['rows'][i]['description'] = [{}]
+
+
+			if p['id'] == 'pageCount':
+
+				# load it from the cache
+				passed_id_escaped = i.replace(":",'_').replace("/",'_')
+				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+					
+					pageCount = None
+
+					if 'volumeInfo' in data:
+						if 'pageCount' in data['volumeInfo']:
+
+							pageCount = data['volumeInfo']['pageCount']
+
+
+					if pageCount != None:
+						response['rows'][i]['pageCount'] = [{'str':pageCount}]
+					else:
+						response['rows'][i]['pageCount'] = [{}]
+
+			if p['id'] == 'language':
+
+				# load it from the cache
+				passed_id_escaped = i.replace(":",'_').replace("/",'_')
+				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+					
+					language = None
+
+					if 'volumeInfo' in data:
+						if 'language' in data['volumeInfo']:
+
+							language = data['volumeInfo']['language']
+
+
+					if language != None:
+						response['rows'][i]['language'] = [{'str':language}]
+					else:
+						response['rows'][i]['language'] = [{}]
+
+
+
+
+
+
+
+
+	print(properties)
+	print(response)
+	print(json.dumps(response,indent=2))
+	return response
 
 
