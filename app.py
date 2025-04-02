@@ -105,42 +105,42 @@ def return_manifest():
         
 
 
-        # try:
-        if 'queries' in request.form:
+        try:
+            if 'queries' in request.form:
 
 
 
-            query = json.loads(request.form['queries'])
+                query = json.loads(request.form['queries'])
 
 
-            for queryId in query:
+                for queryId in query:
 
-                if 'type' in query[queryId]:
-                        
+                    if 'type' in query[queryId]:
+                            
 
-                    if query[queryId]['type'] == 'LC_Work_Id':
-                        return process_id_loc_gov_work_query(query)
-                        break
+                        if query[queryId]['type'] == 'LC_Work_Id':
+                            return process_id_loc_gov_work_query(query)
+                            break
 
-                    if query[queryId]['type'] == 'Google_Books':
-                        return process_google_books_work_query(query)
-                        break
+                        if query[queryId]['type'] == 'Google_Books':
+                            return process_google_books_work_query(query)
+                            break
 
-                    if query[queryId]['type'] == 'OCLC_Record':
-                        return process_oclc_query(query, OCLC_CLIENT_ID, OCLC_SECRET)
-                        break
+                        if query[queryId]['type'] == 'OCLC_Record':
+                            return process_oclc_query(query, OCLC_CLIENT_ID, OCLC_SECRET)
+                            break
 
-                    if query[queryId]['type'] == 'VIAF_Personal':
-                        print('**',query,flush=True)
-                        return process_viaf_query(query)
-                        break
-
-
+                        if query[queryId]['type'] == 'VIAF_Personal':
+                            print('**',query,flush=True)
+                            return process_viaf_query(query)
+                            break
 
 
-        # except Exception as e: 
-        #     print(e)
-        #     pass
+
+
+        except Exception as e: 
+            print(e)
+            pass
 
 
         if 'extend' in request.form:

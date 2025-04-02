@@ -8,6 +8,9 @@ from thefuzz import fuzz
 from .strategies_helpers import _build_recon_dict
 from .strategies_helpers import _build_recon_dict_name
 from .strategies_helpers import normalize_string
+from .strategies_helpers import has_numbers
+from .strategies_helpers import wikidata_return_birth_year_from_viaf_uri
+from .strategies_helpers import lc_return_birth_year_from_viaf_uri
 
 
 
@@ -33,7 +36,7 @@ def process_viaf_query(query):
 
 
 		reconcile_item = _build_recon_dict_name(data)
-		print('**',reconcile_item,flush=True)
+		# print('**',reconcile_item,flush=True)
 
 
 		result =  _search_name(reconcile_item)
@@ -44,8 +47,8 @@ def process_viaf_query(query):
 			'result' : result['or_query_response']
 		}
 
-		print("query_reponsequery_reponsequery_reponsequery_reponse")
-		print(query_reponse)
+		# print("query_reponsequery_reponsequery_reponsequery_reponse")
+		# print(query_reponse)
 
 	return query_reponse
 
@@ -157,11 +160,15 @@ def _parse_name_results(result,reconcile_item):
 
 		# do basic string comparsions to add to the base score
 		# no added info passed we should do some basic fuzzy string comparisons 
-		reconcile_item_name_normalized = normalize_string(reconcile_item['name'])
-		hit_name_normalize = normalize_string(authLabel)		
-		score = score + fuzz.ratio(reconcile_item_name_normalized, hit_name_normalize) / 100 - 0.5
+		# if they both have numbers then keep them otherwise remove numbers
+		remove_numbers = True
+		if has_numbers(reconcile_item['name']) == True and has_numbers(authLabel) == True:
+			remove_numbers = False
+		reconcile_item_name_normalized = normalize_string(reconcile_item['name'],remove_numbers)
+		hit_name_normalize = normalize_string(authLabel,remove_numbers)		
+		score = score + fuzz.token_sort_ratio(reconcile_item_name_normalized, hit_name_normalize) / 100 - 0.5
 
-
+		# print('authLabel:',authLabel, score,flush=True)
 
 
 
@@ -190,14 +197,16 @@ def _parse_name_results(result,reconcile_item):
 						score = 1						
 						break
 
+		was_reconciled_using_birthday = False
 		if 'birth_year' in reconcile_item:
 			if reconcile_item['birth_year'] != False:
 
-				# if the birth year is in the string and the fuzz match is close then set it to 1
-
-				if (fuzz.ratio(reconcile_item_name_normalized, hit_name_normalize) >= 65):
+				# if the birth year is in the string and the fuzz match is close then set it to 1				
+				if (fuzz.token_sort_ratio(reconcile_item_name_normalized, hit_name_normalize) >= 65):
 					if reconcile_item['birth_year'] in authLabel:
 						score = 1
+
+					was_reconciled_using_birthday = True
 
 
 		data = {
@@ -205,10 +214,11 @@ def _parse_name_results(result,reconcile_item):
 			"type": a_hit["recordData"]["VIAFCluster"]["nameType"],
 			"authLabel": authLabel,
 			'titles':titles,
-			'score':score
+			'score':score,
+			"was_reconciled_using_birthday": was_reconciled_using_birthday
 		}
 
-		print(data)
+
 
 		## put it in the cache for later if we need to generate a preview flyout for it
 		file_name = uri.replace(':','_').replace('/','_')
@@ -235,6 +245,40 @@ def _parse_name_results(result,reconcile_item):
 		)
 
 
+	result['or_query_response'] = sorted(result['or_query_response'], key=lambda item: item['score'],reverse=True)
+
+	counter = 0
+	for r in result['or_query_response']:
+
+		counter=counter+1
+
+		if counter>5:
+			break
+
+		if r['score'] == 1:
+			break
+
+
+		if 'birth_year' in reconcile_item:
+			if reconcile_item['birth_year'] != False:
+
+
+				wiki_birth_year = wikidata_return_birth_year_from_viaf_uri(r['id'])
+				if wiki_birth_year != False:
+					if str(wiki_birth_year) == str(reconcile_item['birth_year']):
+						r['score'] = 1
+						break
+
+				lc_birth_year = lc_return_birth_year_from_viaf_uri(r['id'])
+				if lc_birth_year != False:
+					if str(lc_birth_year) == str(reconcile_item['birth_year']):
+						r['score'] = 1
+						break
+
+
+
+	# print("----------------")
+	# print('result',result['or_query_response'],flush=True)
 
 	return result
 
@@ -323,9 +367,9 @@ def extend_data(ids,properties):
 
 
 
-	print(properties)
-	print(response)
-	print(json.dumps(response,indent=2))
+	# print(properties)
+	# print(response)
+	# print(json.dumps(response,indent=2))
 	return response
 
 

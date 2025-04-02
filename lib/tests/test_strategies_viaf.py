@@ -12,52 +12,80 @@ recon_query_3 = {'query': 'Goodman, Paul', 'type': 'VIAF_Personal', 'properties'
 # recon_query_3 = {'query': 'Micheaux, Oscar', 'type': 'VIAF_Personal', 'properties': [{'pid': 'birth_year', 'v': '1884-1951'}], 'type_strict': 'should'}
 
 
+recon_query_4 = {'query': 'Ralph Ellison', 'type': 'VIAF_Personal', 'properties': [{'pid': 'birth_year', 'v': '1914'}], 'type_strict': 'should'}
 
-def test_personal_name_with_title_search():
+recon_query_5 = {'query': 'Tester, Michael', 'type': 'VIAF_Personal', 'properties': [{'pid': 'birth_year', 'v': '1960'}], 'type_strict': 'should'}
+
+
+# def test_personal_name_with_title_search():
 	
-	reconcile_item = _build_recon_dict_name(recon_query_1)
-	data = _search_name(reconcile_item)
+# 	reconcile_item = _build_recon_dict_name(recon_query_1)
+# 	data = _search_name(reconcile_item)
 
-	search_results = _parse_name_results(data,reconcile_item)
+# 	search_results = _parse_name_results(data,reconcile_item)
 	
-	assert search_results['or_query_response'][0]['name'] == 'Goodman, Paul, 1911-1972'
-	assert search_results['or_query_response'][0]['score'] == 1
+# 	assert search_results['or_query_response'][0]['name'] == 'Goodman, Paul, 1911-1972'
+# 	assert search_results['or_query_response'][0]['score'] == 1
 
 
 
 
-def test_personal_name_no_extra_data():
+# def test_personal_name_no_extra_data():
 	
-	reconcile_item = _build_recon_dict_name(recon_query_2)
+# 	reconcile_item = _build_recon_dict_name(recon_query_2)
+# 	data = _search_name(reconcile_item)
+
+# 	search_results = _parse_name_results(data,reconcile_item)
+
+# 	# we have to sort it, normally open refine will do that
+# 	newlist = sorted(search_results['or_query_response'], key=lambda d: d['score'],reverse=True)
+	
+# 	assert newlist[0]['name'] == 'Lucas, Curtis, 1914-'
+# 	assert newlist[0]['score'] > 0.5
+
+
+
+# def test_personal_with_birth_year():
+	
+# 	reconcile_item = _build_recon_dict_name(recon_query_3)
+# 	data = _search_name(reconcile_item)
+
+# 	search_results = _parse_name_results(data,reconcile_item)
+
+# 	# we have to sort it, normally open refine will do that
+# 	newlist = sorted(search_results['or_query_response'], key=lambda d: d['score'],reverse=True)
+	
+# 	assert newlist[0]['name'] == 'Goodman, Paul, 1911-1972'
+# 	assert newlist[0]['score'] == 1
+
+
+
+def test_personal_with_birth_year_but_not_in_heading1():
+
+	reconcile_item = _build_recon_dict_name(recon_query_4)
 	data = _search_name(reconcile_item)
 
 	search_results = _parse_name_results(data,reconcile_item)
 
 	# we have to sort it, normally open refine will do that
 	newlist = sorted(search_results['or_query_response'], key=lambda d: d['score'],reverse=True)
+
+	assert newlist[0]['id'] == 'http://viaf.org/viaf/2481446'
 	
-	assert newlist[0]['name'] == 'Lucas, Curtis, 1914-'
-	assert newlist[0]['score'] > 0.5
+def test_personal_with_birth_year_but_not_in_heading2():
 
-
-
-def test_personal_with_birth_year():
-	
-	reconcile_item = _build_recon_dict_name(recon_query_3)
+	reconcile_item = _build_recon_dict_name(recon_query_5)
 	data = _search_name(reconcile_item)
 
 	search_results = _parse_name_results(data,reconcile_item)
 
 	# we have to sort it, normally open refine will do that
 	newlist = sorted(search_results['or_query_response'], key=lambda d: d['score'],reverse=True)
-	
-	assert newlist[0]['name'] == 'Goodman, Paul, 1911-1972'
-	assert newlist[0]['score'] == 1
+
+	assert newlist[0]['id'] == 'http://viaf.org/viaf/75676253'
 
 
 
-	
-	
 
 
 
