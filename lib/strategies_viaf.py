@@ -74,7 +74,7 @@ def _search_name(reconcile_item):
 	    },
 	    "reqValues": {
 	        "field": field,
-	        "index": "viaf",
+	        "index": "VIAF",
 	        "searchTerms": reconcile_item['name']
 	    }
 	}
