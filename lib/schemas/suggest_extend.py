@@ -71,6 +71,33 @@ extend_values_Worldcat = {
   ]
 }
 
+extend_values_HathiTrust = {
+  "limit": 10,
+  "type": "HathiTrust",
+  "properties": [
+    {
+      "id": "hdl",
+      "name": "Volume Handles"
+    },
+    {
+      "id": "OCLC",
+      "name": "OCLC Numbers"
+    },
+    {
+      "id": "ISBN",
+      "name": "ISBN Numbers"
+    },
+    {
+      "id": "LCCN",
+      "name": "LCCN Numbers"
+    },
+    {
+      "id": "thumbnail",
+      "name": "Thumbnail URL"
+    }
+
+  ]
+}
 
 
 
@@ -84,6 +111,9 @@ def suggest_extend(query):
         return extend_values_VIAF
     if query == 'OCLC_Record':
         return extend_values_Worldcat
+    if query == 'HathiTrust':
+        return extend_values_HathiTrust
+
 
     return None
 

@@ -22,7 +22,10 @@ manifest = {
       "id": "OCLC_Record",
       "name": "Title -- Worldcat"
     },
-
+    {
+      "id": "HathiTrust",
+      "name": "Title -- HathiTrust"
+    },
     {
       "id": "VIAF_Personal",
       "name": "Name -- VIAF Personal"

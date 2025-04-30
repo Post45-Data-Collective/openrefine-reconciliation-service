@@ -49,9 +49,10 @@ def test_personal_with_birth_year():
 	
 	reconcile_item = _build_recon_dict_name(recon_query_3)
 	data = _search_name(reconcile_item)
-
+	print("data",data,flush=True)
 	search_results = _parse_name_results(data,reconcile_item)
-
+	print("search_results",search_results,flush=True)
+	print(search_results['or_query_response'],flush=True)
 	# we have to sort it, normally open refine will do that
 	newlist = sorted(search_results['or_query_response'], key=lambda d: d['score'],reverse=True)
 	

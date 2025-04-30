@@ -10,6 +10,8 @@ from lib.strategies_id_loc_gov import process_id_loc_gov_work_query
 from lib.strategies_google_books import process_google_books_work_query
 from lib.strategies_oclc import process_oclc_query
 from lib.strategies_viaf import process_viaf_query
+from lib.strategies_hathitrust import process_hathi_query
+
 
 from lib.strategies_id_loc_gov import extend_data as extend_data_id
 
@@ -19,6 +21,7 @@ from lib.strategies_oclc import extend_data as extend_data_worldcat
 
 from lib.strategies_google_books import extend_data as extend_data_google
 
+from lib.strategies_hathitrust import extend_data as extend_data_hathi
 
 
 
@@ -36,6 +39,7 @@ import pathlib
 OCLC_CLIENT_ID = os.environ.get('OCLC_CLIENT_ID', None) 
 OCLC_SECRET = os.environ.get('OCLC_SECRET', None) 
 
+HATHI_FULL_SEARCH_ONLY = False
 
 
 
@@ -50,7 +54,12 @@ print(manifest)
 def hello_world():
     global OCLC_CLIENT_ID
     global OCLC_SECRET
+    global HATHI_FULL_SEARCH_ONLY
 
+    HATHI_FULL_SEARCH_ONLY = request.args.get('HATHI_FULL_SEARCH_ONLY', None)
+
+
+    html = '<h1 style="margin-bottom:2em;">Post45 Reconciliation Service Configuration</h1>'
     # they are not set
     if OCLC_CLIENT_ID == None or OCLC_SECRET == None:
 
@@ -60,8 +69,8 @@ def hello_world():
         if OCLC_CLIENT_ID == None or OCLC_SECRET == None:
 
 
-            return """
-                <h1>Set API Keys:</h1>
+            html = html + """
+                <h2>Set API Keys:</h2>
                 <form action="" method="get">
                     <input type="text" id placeholder="OCLC_CLIENT_ID"   name="OCLC_CLIENT_ID" id="OCLC_CLIENT_ID"  style="width:50%"/>
                     <input type="text" id placeholder="OCLC_SECRET"   name="OCLC_SECRET" id="OCLC_SECRET"  style="width:50%"/>            
@@ -72,20 +81,48 @@ def hello_world():
             """
         else:
 
-            return """
+            html = html + """
 
-                <h1>Set API Keys:</h1>
+                <h2>Set API Keys:</h2>
                 <div>OCLC Keys set</div>
 
             """
     else:
+        
+            html = html + """
 
-            return """
-
-                <h1>Set API Keys:</h1>
+                <h2>Set API Keys:</h2>
                 <div>OCLC Keys set</div>
 
             """
+
+
+    HATHI_FULL_SEARCH_ONLY_checked = ""
+    if HATHI_FULL_SEARCH_ONLY == "on":
+        HATHI_FULL_SEARCH_ONLY_checked = "checked"
+
+
+    html = html + f"""
+
+        <hr style="margin: 5em 0 5em 0;">
+        <h2>HathiTrust Configuration:</h2>
+        <div>
+            <form action="" method="get">
+
+                <input type="checkbox" placeholder="HATHI_FULL_SEARCH_ONLY" name="HATHI_FULL_SEARCH_ONLY" id="HATHI_FULL_SEARCH_ONLY" {HATHI_FULL_SEARCH_ONLY_checked} />            
+                <label for="HATHI_FULL_SEARCH_ONLY">Only return "Full view" resources</label>
+                <input style="display:block; margin-top:2em" type="submit" value="Save" />
+            </form>
+        </div>
+    """
+
+
+
+    print("HATHI_FULL_SEARCH_ONLY",HATHI_FULL_SEARCH_ONLY,flush=True)
+
+    return html
+
+
 
 @app.route("/api/v1/reconcile", methods = ['GET', 'POST', 'DELETE'])
 def return_manifest():
@@ -135,6 +172,13 @@ def return_manifest():
                             return process_viaf_query(query)
                             break
 
+                        if query[queryId]['type'] == 'HathiTrust':
+                            print('**',query,flush=True)
+                            return process_hathi_query(query, HATHI_FULL_SEARCH_ONLY)
+                            break
+
+                        
+
 
 
 
@@ -158,6 +202,8 @@ def return_manifest():
                         return extend_data_worldcat(extend_req['ids'],extend_req['properties'])
                     elif "googleapis.com" in extend_req['ids'][0]:
                         return extend_data_google(extend_req['ids'],extend_req['properties'])
+                    elif "hathitrust.org" in extend_req['ids'][0]:
+                        return extend_data_hathi(extend_req['ids'],extend_req['properties'])
 
 
 
@@ -211,6 +257,8 @@ def view_redirect():
     if 'viaf' in passed_id:
         return redirect(passed_id, code=302)
 
+    if 'hathi' in passed_id:
+        return redirect(passed_id, code=302)
 
 
 @app.route("/api/v1/preview")
