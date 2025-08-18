@@ -1,8 +1,16 @@
 import requests
 import os
 import json
+import uuid
+
+
+from thefuzz import fuzz
+
 
 from .strategies_helpers import _build_recon_dict
+from .strategies_helpers import normalize_string
+from .strategies_helpers import has_numbers
+from .strategies_helpers import remove_subtitle
 
 
 ID_HEADERS = {
@@ -13,35 +21,29 @@ ID_HEADERS = {
 
 
 
-def process_google_books_work_query(query):
+def process_google_books_query(query, passed_config):
 	"""This is what is called from the query endpoint, it will figure out how to process the work query
-
-
 	"""
+	global config
+	config = passed_config
 
-
-	print(query)
+	req_ip = query['req_ip']
+	del query['req_ip']  # Remove req_ip from the query dictionary to avoid passing it to _build_recon_dict
+	
 	query_reponse = {}
 	# we need to figure out what type strategy we are going to use based on what they have sent with the reqest
 	for queryId in query:
-		print(queryId)
-		print(query[queryId])
-		print('---------')
-
 		data = query[queryId]
-
 
 		reconcile_item = _build_recon_dict(data)
 
-		# decide how to proceed
-		print("reconcile_item",reconcile_item)
-		author_name = False
+		author_name = ""
+
 		if reconcile_item['contributor_uncontrolled_last_first'] != False:
 			author_name = reconcile_item['contributor_uncontrolled_last_first']
-		elif reconcile_item['contributor_uncontrolled_first_last'] != False: 
+		elif reconcile_item['contributor_uncontrolled_first_last'] != False:
 			author_name = reconcile_item['contributor_uncontrolled_first_last']
-
-		elif reconcile_item['contributor_naco_controlled'] != False: 
+		elif reconcile_item['contributor_naco_controlled'] != False:
 			# google books seems to give different results if passed a full naco formed name with life dates
 			# it seems to like just having the authors name, so try make the name LESS accurate
 			author_name = reconcile_item['contributor_naco_controlled']
@@ -49,29 +51,25 @@ def process_google_books_work_query(query):
 			author_name = ''.join([i for i in author_name if not i.isdigit()])
 			author_name = author_name.replace('-','')
 
-			# if ',' in author_name:
-			# 	author_name = author_name.split(',')
+		reconcile_item['author_name'] = author_name
 
+		# if they configured to remove subtitles then do that
+		if config.get('POST45_REMOVE_SUBTITLE', False) == True:
+			reconcile_item['title'] = remove_subtitle(reconcile_item['title'])
 
+		print("reconcile_item", reconcile_item, flush=True)
 
-		result =  _search_title(reconcile_item['title'], author_name)
-		result = _parse_title_results(result,reconcile_item['title'],author_name)
+		result = _search_google_books(reconcile_item, passed_config)
+		print("result", result, flush=True)
 
+		if config.get('POST45_RECONCILIATION_MODE', 'single') == 'cluster':
+			result = _cluster_works(result, reconcile_item, req_ip)
+		elif config.get('POST45_RECONCILIATION_MODE', 'single') == 'single':
+			result = _parse_single_results(result, reconcile_item)
 
 		query_reponse[queryId] = {
 			'result' : result['or_query_response']
 		}
-
-		# contributor_uncontrolled_last_first
-
-
-
-
-		
-
-	print("SENDING:!!!!")
-	print(query_reponse)
-
 
 	return query_reponse
 
@@ -261,120 +259,269 @@ def process_google_books_work_query(query):
 
 
 
-def _search_title(title,name):
+def _search_google_books(reconcile_item, passed_config):
 	"""
-		Do a pretty search at google
+		Do a search at Google Books API with fuzzy matching and scoring
 	"""	
 
 	url = 'https://www.googleapis.com/books/v1/volumes'
 
-
-	q_string = f'intitle:{title}'
-	if name != False:
-		q_string = q_string + f'+inauthor:{name}'
-
+	q_string = f"intitle:{reconcile_item['title']}"
+	if reconcile_item['author_name'] and reconcile_item['author_name'] != "":
+		q_string = q_string + f" inauthor:{reconcile_item['author_name']}"
 
 	params = {
 		'q' : q_string,
-		'projection': 'full'
+		'projection': 'full',
+		'maxResults': 40  # Increase from default 10 to get more results to score
 	}
-	print(params)
-
+	print(params, flush=True)
 
 	try:
 		response = requests.get(url, params=params, headers=ID_HEADERS)
-	except requests.exceptions.RequestException as e:  # This is the correct syntax
-		print("ERROR:", e)
+	except requests.exceptions.RequestException as e:
+		print("ERROR:", e, flush=True)
 		# create a response 
 		return {
 			'successful': False,
 			'error': str(e),
 			'kind': 'books#volumes',
 			'totalItems': 0,
-			'params': params,
 			'items': []
 		}
-
 
 	data = response.json()
 	data['successful'] = True
 	data['error'] = None
 
-	if data['totalItems'] == 0:
-
+	if 'totalItems' not in data or data['totalItems'] == 0:
 		data['items'] = []
+		return data
 
-	# print("*******")	
-	# print(name, title)
-	# print(data)
-	# print("------------")
-
+	# Score each hit based on fuzzy matching
+	scored_items = []
+	for item in data.get('items', []):
+		# Initialize score
+		score = 0.5  # Base score for being in results
+		
+		# Extract volume info
+		volume_info = item.get('volumeInfo', {})
+		
+		# Extract title
+		item_title = volume_info.get('title', '')
+		item_subtitle = volume_info.get('subtitle', '')
+		if item_subtitle:
+			full_title = f"{item_title}: {item_subtitle}"
+		else:
+			full_title = item_title
+		
+		# Extract authors
+		authors = volume_info.get('authors', [])
+		
+		# Test title matching
+		title_scores = []
+		if reconcile_item['title']:
+			if item_title:
+				title_ratio = fuzz.token_sort_ratio(item_title, reconcile_item['title'])
+				print(f"Title comparison: '{item_title}' vs '{reconcile_item['title']}' = {title_ratio}", flush=True)
+				title_scores.append(title_ratio)
+			
+			# Also test full title with subtitle
+			if full_title != item_title:
+				full_title_ratio = fuzz.token_sort_ratio(full_title, reconcile_item['title'])
+				title_scores.append(full_title_ratio)
+		
+		# Get best title score
+		best_title_score = max(title_scores) if title_scores else 0
+		
+		# Test author/contributor matching if author_name is provided
+		author_scores = []
+		if reconcile_item['author_name'] and reconcile_item['author_name'] != "":
+			for author in authors:
+				if author:
+					# Determine if we should remove numbers
+					remove_numbers = True
+					if has_numbers(author) and has_numbers(reconcile_item['author_name']):
+						remove_numbers = False
+					
+					# Normalize and compare
+					author_normalized = normalize_string(author, remove_numbers)
+					query_author_normalized = normalize_string(reconcile_item['author_name'], remove_numbers)
+					
+					author_ratio = fuzz.token_sort_ratio(author_normalized, query_author_normalized)
+					author_scores.append(author_ratio)
+					
+					print(f"Author comparison: '{author_normalized}' vs '{query_author_normalized}' = {author_ratio}", flush=True)
+		
+		# Get best author score
+		best_author_score = max(author_scores) if author_scores else 0
+		
+		# Calculate final score
+		if reconcile_item['author_name'] and reconcile_item['author_name'] != "":
+			# Both title and author matter
+			if best_title_score > 80 and best_author_score > 80:
+				score = 0.95
+			elif best_title_score > 70 and best_author_score > 95:
+				score = 0.90
+			elif best_title_score > 50 and best_author_score >= 100:
+				score = 0.85
+			elif best_title_score > 60 or best_author_score > 60:
+				score = 0.60
+			else:
+				score = 0.30
+		else:
+			# Only title matters
+			if best_title_score > 90:
+				score = 0.95
+			elif best_title_score > 80:
+				score = 0.85
+			elif best_title_score > 70:
+				score = 0.70
+			elif best_title_score > 50:
+				score = 0.50
+			else:
+				score = 0.30
+		
+		# Add score to item
+		item['fuzzy_score'] = score
+		item['title_score'] = best_title_score
+		item['author_score'] = best_author_score
+		scored_items.append(item)
+		
+		print(f"Hit: {volume_info.get('title', 'N/A')} - Title Score: {best_title_score}, Author Score: {best_author_score}, Final Score: {score}", flush=True)
+	
+	# Sort items by score
+	data['items'] = sorted(scored_items, key=lambda x: x['fuzzy_score'], reverse=True)
+	
+	# Apply quality score filtering if configured
+	if passed_config.get('POST45_GOOGLE_CLUSTER_QUALITY_SCORE') == 'very high':
+		data['items'] = [item for item in data['items'] if item['fuzzy_score'] >= 0.95]
+	elif passed_config.get('POST45_GOOGLE_CLUSTER_QUALITY_SCORE') == 'high':
+		data['items'] = [item for item in data['items'] if item['fuzzy_score'] >= 0.90]
+	elif passed_config.get('POST45_GOOGLE_CLUSTER_QUALITY_SCORE') == 'medium':
+		data['items'] = [item for item in data['items'] if item['fuzzy_score'] >= 0.80]
+	elif passed_config.get('POST45_GOOGLE_CLUSTER_QUALITY_SCORE') == 'low':
+		data['items'] = [item for item in data['items'] if item['fuzzy_score'] >= 0.60]
+	elif passed_config.get('POST45_GOOGLE_CLUSTER_QUALITY_SCORE') == 'very low':
+		data['items'] = [item for item in data['items'] if item['fuzzy_score'] >= 0.30]
+	
 	return data
 
 
-def _parse_title_results(result,title,author):
+def _parse_single_results(data, reconcile_item):
 	"""
-		Parse the results based on quality checks other cleanup needed before we send it back to the client
-	"""	
-
-	last = None
-	first = None
-
-	# # split out the parts of the name
-	# if reconcile_item['contributor_uncontrolled_last_first'] != False:
-	# 	last = reconcile_item['contributor_uncontrolled_last_first'].split(',')[0].strip().split(' ')[0]
-
-	# 	first = reconcile_item['contributor_uncontrolled_last_first'].split(',')[1].strip().split(' ')[0]
-
-	# if reconcile_item['contributor_uncontrolled_first_last'] != False:
-	# 	last = reconcile_item['contributor_uncontrolled_first_last'].split(',')[1].strip().split(' ')[0]
-	# 	first = reconcile_item['contributor_uncontrolled_first_last'].split(',')[0].strip().split(' ')[0]
-
-
+	Parse the results from _search_google_books and format them for OpenRefine
+	"""
+	result = {}
 	result['or_query_response'] = []
-
-	for a_hit in result['items']:
-
-		uri = 'https://www.googleapis.com/books/v1/volumes/' + a_hit['id']
+	
+	# Process each hit from the scored results
+	for item in data.get('items', []):
+		# Start with the existing fuzzy score
+		final_score = item.get('fuzzy_score', 0.5)
+		
+		# Check if we should boost score based on publication year
+		if reconcile_item.get('work_published_year') and reconcile_item['work_published_year'] != False:
+			user_year = str(reconcile_item['work_published_year'])
+			
+			# Check published date in volumeInfo
+			year_match = False
+			volume_info = item.get('volumeInfo', {})
+			
+			if 'publishedDate' in volume_info and volume_info['publishedDate']:
+				if user_year in str(volume_info['publishedDate']):
+					year_match = True
+					print(f"Year match found in publishedDate: {volume_info['publishedDate']} matches {user_year}", flush=True)
+			
+			# Boost score if year matches
+			if year_match:
+				final_score = min(final_score + 1.0, 1.0)  # Add 1 but cap at 1.0
+				print(f"Boosted score for {item.get('id', 'unknown')} from {item.get('fuzzy_score', 0.5)} to {final_score} due to year match", flush=True)
+		
+		# Cache the item
+		uri = 'https://www.googleapis.com/books/v1/volumes/' + item['id']
 		file_name = uri.replace(':','_').replace('/','_')
-		with open(f'data/cache/{file_name}','w') as out:
-			json.dump(a_hit,out)
+		with open(f'data/cache/google_books_{file_name}','w') as out:
+			json.dump(item, out)
+		
+		# Create the OpenRefine response item
+		volume_info = item.get('volumeInfo', {})
+		title = volume_info.get('title', '')
+		subtitle = volume_info.get('subtitle', '')
+		display_title = f"{title}: {subtitle}" if subtitle else title
+		
+		result['or_query_response'].append({
+			"id": uri,
+			"name": display_title,
+			"description": volume_info.get('description', '')[:200] if 'description' in volume_info else '',
+			"score": final_score,
+			"match": final_score > 0.8,  # Consider it a match if score > 0.8
+			"type": [
+				{
+					"id": "google_books",
+					"name": "Google Books Volume"
+				}
+			]
+		})
+	
+	# Sort the results by score in descending order
+	result['or_query_response'] = sorted(result['or_query_response'], key=lambda item: item['score'], reverse=True)
+	return result
 
 
-		# if it was in the response from the server that means it matched something, so give it a basline score
-		score = 0.5
-		print("----a_hit-----")
-		print(a_hit)
-		print("last",last)
-		print("first",first)
-		a_hit['first'] = first
-		a_hit['last'] = last
-
-		# if the last name is not the first thing in AAP then we got a problem
-		# TODO
-
-
-
-
-
-		result['or_query_response'].append(
-			{
-				"id": 'https://www.googleapis.com/books/v1/volumes/' + a_hit['id'],
-				"name": a_hit['volumeInfo']['title'],
-				"description": '',
-				"score": score,
-				"match": True,
-				"type": [
-					{
-					"id": "google",
-					"name": "Google Volume"
-					}
-				]
+def _cluster_works(records, reconcile_item, req_ip):
+	"""
+	Cluster Google Books results
+	"""
+	
+	if 'items' in records:
+		records = records['items']
+	
+	all_clusters = {
+		'cluster' :  records,
+		'cluster_excluded' : []
+	}
+	
+	result = {}
+	result['or_query_response'] = []
+	
+	use_id = str(uuid.uuid4())
+	
+	# for unit tests, config might not be set
+	try:
+		config
+	except NameError:
+		config = {}
+		
+	## need this for unit tests
+	if 'APP_BASE' not in config:
+		config['APP_BASE'] = 'http://localhost:5001/'
+	
+	use_uri = config['APP_BASE'] + 'cluster/google_books/' + use_id
+	all_clusters['orginal'] = {
+		'title': reconcile_item['title'],
+		'author': reconcile_item['author_name'],
+	}
+	with open(f'data/cache/cluster_google_books_{use_id}','w') as out:
+		json.dump(all_clusters, out)
+	
+	with open(f'data/cache/cluster_cache_google_books_{req_ip}','a') as out:
+		out.write(f'cluster_google_books_{use_id}\n')
+	
+	result['or_query_response'].append({
+			"id": use_uri,
+			"name": f"Clustered: {len(all_clusters['cluster'])}, Excluded: {len(all_clusters['cluster_excluded'])}",
+			"description": '',
+			"score": 1,
+			"match": True,
+			"type": [
+				{
+				"id": "google_books",
+				"name": "Google_Books_Cluster"
 			}
-		)
-
-
-
+		]
+	})
+	
 	return result
 
 
@@ -383,9 +530,9 @@ def _parse_title_results(result,title,author):
 
 
 
-def extend_data(ids,properties):
+def extend_data(ids, properties, passed_config):
 	"""
-		Sent Ids and proeprties it talks to viaf and returns the reuqested values
+	Sent Ids and properties it talks to Google Books and returns the requested values
 	"""
 
 	response = {"meta":[],"rows":{}}
@@ -413,17 +560,16 @@ def extend_data(ids,properties):
 
 
 	for i in ids:
-
 		response['rows'][i]={}
 
-		for p in properties:
-
-			if p['id'] == 'ISBN':
-
-				# load it from the cache
-				passed_id_escaped = i.replace(":",'_').replace("/",'_')
-				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+		if 'volumes/' in i:
+			# Single volume
+			for p in properties:
+				if p['id'] == 'ISBN':
+					# load it from the cache
+					passed_id_escaped = i.replace(":",'_').replace("/",'_')
+					if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+						data = json.load(open(f'data/cache/{passed_id_escaped}'))
 					
 					isbns = []
 
@@ -439,16 +585,21 @@ def extend_data(ids,properties):
 
 
 					if len(isbns) > 0:
-						response['rows'][i]['ISBN'] = [{'str':"|".join(isbns)}]
+						response['rows'][i]['ISBN'] = []
+						for isbn in isbns:
+							response['rows'][i]['ISBN'].append({'str':isbn})
+					
+					
+
+						# fill-down
 					else:
 						response['rows'][i]['ISBN'] = [{}]
 
-			if p['id'] == 'description':
-
-				# load it from the cache
-				passed_id_escaped = i.replace(":",'_').replace("/",'_')
-				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+				elif p['id'] == 'description':
+					# load it from the cache
+					passed_id_escaped = i.replace(":",'_').replace("/",'_')
+					if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+						data = json.load(open(f'data/cache/{passed_id_escaped}'))
 					
 					description = ""
 
@@ -464,12 +615,11 @@ def extend_data(ids,properties):
 						response['rows'][i]['description'] = [{}]
 
 
-			if p['id'] == 'pageCount':
-
-				# load it from the cache
-				passed_id_escaped = i.replace(":",'_').replace("/",'_')
-				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+				elif p['id'] == 'pageCount':
+					# load it from the cache
+					passed_id_escaped = i.replace(":",'_').replace("/",'_')
+					if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+						data = json.load(open(f'data/cache/{passed_id_escaped}'))
 					
 					pageCount = None
 
@@ -480,16 +630,15 @@ def extend_data(ids,properties):
 
 
 					if pageCount != None:
-						response['rows'][i]['pageCount'] = [{'str':pageCount}]
+						response['rows'][i]['pageCount'] = [{'str':str(pageCount)}]
 					else:
 						response['rows'][i]['pageCount'] = [{}]
 
-			if p['id'] == 'language':
-
-				# load it from the cache
-				passed_id_escaped = i.replace(":",'_').replace("/",'_')
-				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+				elif p['id'] == 'language':
+					# load it from the cache
+					passed_id_escaped = i.replace(":",'_').replace("/",'_')
+					if os.path.isfile(f'data/cache/{passed_id_escaped}'):
+						data = json.load(open(f'data/cache/{passed_id_escaped}'))
 					
 					language = None
 
@@ -511,9 +660,84 @@ def extend_data(ids,properties):
 
 
 
-	print(properties)
-	print(response)
-	print(json.dumps(response,indent=2))
+		elif 'cluster/google_books' in i:
+			# Cluster of volumes
+			uuid_val = i.split('/')[-1]
+			filename = f'data/cache/cluster_google_books_{uuid_val}'
+			if os.path.isfile(filename):
+				data = json.load(open(filename))
+				print(data, flush=True)
+				
+				# Extract data from cluster items
+				for p in properties:
+					if p['id'] == 'ISBN':
+						isbn_values = []
+						seen_isbns = set()
+						for item in data.get('cluster', []):
+							volume_info = item.get('volumeInfo', {})
+							if 'industryIdentifiers' in volume_info:
+								for identifier in volume_info['industryIdentifiers']:
+									if 'ISBN' in identifier.get('type', ''):
+										isbn = identifier['identifier']
+										if isbn not in seen_isbns:
+											seen_isbns.add(isbn)
+											isbn_values.append({"str": isbn})
+						response['rows'][i]['ISBN'] = isbn_values if isbn_values else [{}]
+					
+					elif p['id'] == 'description':
+						desc_values = []
+						seen_desc = set()
+						for item in data.get('cluster', []):
+							volume_info = item.get('volumeInfo', {})
+							if 'description' in volume_info and volume_info['description']:
+								desc = volume_info['description']
+								if desc not in seen_desc:
+									seen_desc.add(desc)
+									desc_values.append({"str": desc})
+						response['rows'][i]['description'] = desc_values if desc_values else [{}]
+					
+					elif p['id'] == 'pageCount':
+						page_values = []
+						seen_pages = set()
+						for item in data.get('cluster', []):
+							volume_info = item.get('volumeInfo', {})
+							if 'pageCount' in volume_info and volume_info['pageCount']:
+								page_count = str(volume_info['pageCount'])
+								if page_count not in seen_pages:
+									seen_pages.add(page_count)
+									page_values.append({"str": page_count})
+						response['rows'][i]['pageCount'] = page_values if page_values else [{}]
+					
+					elif p['id'] == 'language':
+						lang_values = []
+						seen_langs = set()
+						for item in data.get('cluster', []):
+							volume_info = item.get('volumeInfo', {})
+							if 'language' in volume_info and volume_info['language']:
+								lang = volume_info['language']
+								if lang not in seen_langs:
+									seen_langs.add(lang)
+									lang_values.append({"str": lang})
+						response['rows'][i]['language'] = lang_values if lang_values else [{}]
+
+	print(i, flush=True)
+	print(properties, flush=True)
+	print(response, flush=True)
+	
+	# If join mode is enabled, convert lists to pipe-delimited strings
+	if passed_config and passed_config.get('POST45_DATA_EXTEND_MODE') == 'join':
+		for row_id in response['rows']:
+			for field in response['rows'][row_id]:
+				if isinstance(response['rows'][row_id][field], list):
+					# Extract the 'str' value from each dict and join with pipes
+					values = []
+					for item in response['rows'][row_id][field]:
+						if isinstance(item, dict) and 'str' in item:
+							values.append(item['str'])
+					print("values", values, flush=True)
+					response['rows'][row_id][field] = [{"str": '|'.join(values)}] if values else [{}]
+					print(response['rows'][row_id][field], flush=True)
+	
 	return response
 
 

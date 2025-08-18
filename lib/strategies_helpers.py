@@ -4,7 +4,7 @@ import re
 import requests
 import os
 import xml.etree.ElementTree as ET
-
+import json
 
 GENERIC_HEADERS = {
 	'User-Agent':'Openrefine Post45 Reconcilation Client'
@@ -13,13 +13,14 @@ GENERIC_HEADERS = {
 
 
 def _build_recon_dict(recon_query):
-
+	# print("being passed:",recon_query, flush=True)
 	reconcile_item = {
 		'title': _build_title_for_uncontrolled_name_search(recon_query['query']),
 		'type': recon_query['type'],
 		'contributor_uncontrolled_last_first': False,
 		'contributor_uncontrolled_first_last': False,
-		'contributor_naco_controlled': False
+		'contributor_naco_controlled': False,
+		'work_published_year': False
 	}
 
 	if 'properties' in recon_query:
@@ -31,6 +32,8 @@ def _build_recon_dict(recon_query):
 				reconcile_item['contributor_uncontrolled_first_last'] = prop['v']
 			if prop['pid'] == 'contributor_naco_controlled':
 				reconcile_item['contributor_naco_controlled'] = prop['v']
+			if prop['pid'] == 'work_published_year':
+				reconcile_item['work_published_year'] = prop['v']
 
 	return reconcile_item
 
@@ -72,8 +75,9 @@ def _build_title_for_uncontrolled_name_search(title):
 		takes a tile and parses it for how this endpoint works best
 
 	"""
-	title = title.split(":")[0].strip()
-	title = title.split(";")[0].strip()
+	# we added a better function to remove subtitles that is configurable so dont do it automatically
+	# title = title.split(":")[0].strip()
+	# title = title.split(";")[0].strip()
 	return title
 
 
@@ -230,7 +234,82 @@ def _return_wikidata_value(qid,pid):
 
 
 
+def reset_cluster_cache(req_ip, query):
+		
+	for queryId in query:
 
+		if 'type' in query[queryId]:
+
+			if query[queryId]['type'] == 'LC_Work_Id':
+				if os.path.isfile(f'data/cache/cluster_cache_id_{req_ip}'):
+					os.remove(f'data/cache/cluster_cache_id_{req_ip}')
+
+				with open(f'data/cache/cluster_cache_id_{req_ip}','w') as out:
+					out.write('')
+
+			if query[queryId]['type'] == 'Google_Books':
+				if os.path.isfile(f'data/cache/cluster_cache_google_{req_ip}'):
+					os.remove(f'data/cache/cluster_cache_google_{req_ip}')
+
+				with open(f'data/cache/cluster_cache_google_{req_ip}','w') as out:
+					out.write('')
+
+			if query[queryId]['type'] == 'HathiTrust':
+				if os.path.isfile(f'data/cache/cluster_cache_hathi_{req_ip}'):
+					os.remove(f'data/cache/cluster_cache_hathi_{req_ip}')
+
+				with open(f'data/cache/cluster_cache_hathi_{req_ip}','w') as out:
+					out.write('')
+
+
+def build_cluster_data(req_ip,service):
+	"""
+		Builds the cluster data for the given request IP.
+		This function reads the cluster cache file and builds a dictionary of clusters.
+	"""
+	if not os.path.isfile(f'data/cache/cluster_cache_{service}_{req_ip}'):
+		return {}
+	
+	print(f"Building cluster data for {req_ip}"	)
+	all_clusters = {}
+	cluster_stats = {}
+	cluster_stats_lang = {}
+	
+	with open(f'data/cache/cluster_cache_{service}_{req_ip}','r') as f:
+		for line in f:
+			print(line)
+			line = line.strip()
+			if os.path.isfile(f'data/cache/{line}'):
+				with open(f'data/cache/{line}', 'r') as cluster_file:
+					cluster_data = cluster_file.read()
+					cluster_data = json.loads(cluster_data)
+					
+
+					clusters = cluster_data['cluster'] + cluster_data['cluster_excluded']
+					this_cluster_lang = []
+					for item in clusters:
+						lang = item.get('lang')
+						if lang not in this_cluster_lang:
+							this_cluster_lang.append(lang)
+
+						if lang:
+							cluster_stats_lang[lang] = cluster_stats_lang.get(lang, 0) + 1
+					
+					print(this_cluster_lang)
+					all_clusters[line] = {
+						'data': cluster_data,
+						'languages': this_cluster_lang,
+						'id': line
+					}
+
+
+	print("Cluster stats by language:", cluster_stats_lang	)
+
+	return {
+		'clusters': all_clusters,
+		'languages': cluster_stats_lang,
+	}
+	
 
 
 def wikidata_return_birth_year_from_viaf_uri(uri):
@@ -299,3 +378,96 @@ def normalize_string(s, remove_numbers=False):
 		s = s.translate(remove_digits)
 
 	return s
+
+
+def remove_subtitle(title):
+	"""
+	Remove subtitle and descriptive phrases from a title string.
+	
+	First removes text after colons ":" or semicolons ";"
+	Then removes common descriptive phrases that typically appear at the end of titles.
+	
+	Args:
+		title (str): The title string to process
+		
+	Returns:
+		str: The cleaned title with subtitles and descriptive phrases removed
+	"""
+	if not title or not isinstance(title, str):
+		return title
+	
+	# Make a copy to work with
+	cleaned_title = title.strip()
+	
+	# First, remove text after colons or semicolons
+	cleaned_title = cleaned_title.split(":")[0].strip()
+	cleaned_title = cleaned_title.split(";")[0].strip()
+	cleaned_title = cleaned_title.split(", by")[0].strip()
+
+	# Define phrases to remove (in order of specificity - longer phrases first)
+	phrases_to_remove = [
+		"a science-fiction novel",
+		"an original novel",
+		"and other stories",
+		"a collection of",
+		"an anthology of",
+		"selected stories",
+		"selected works",
+		"a conversation piece",
+		"translated from the",
+		"myths and legends",
+		"a novel of",
+		"a story of",
+		"the story of",
+		"a tale of",
+		"memoirs of",
+		"scenes from",
+		"consisting of",
+		"retold from",
+		"short stories",
+		"folk tales",
+		"fairy tales",
+		"a novel",
+		"a mystery",
+		"a reminiscence",
+		"a romance",
+		"a tale",
+		"a fable",
+		"a chronicle",
+		"a satire",
+		"a diversion",
+		"a trilogy",
+		"stories",
+		"novellas",
+		"or,",
+		", by",
+		"by"
+	]
+	
+	# Convert to lowercase for case-insensitive matching
+	cleaned_lower = cleaned_title.lower()
+	
+	# Look for each phrase and remove it (and everything after it) if found
+	for phrase in phrases_to_remove:
+		phrase_lower = phrase.lower()
+		
+		# Find the phrase in the title
+		pos = cleaned_lower.find(phrase_lower)
+		
+		if pos != -1:
+			# Check if this phrase appears near the end or is preceded by appropriate separators
+			# We'll be flexible and look for phrases that start with word boundaries
+			before_phrase = cleaned_lower[:pos].strip()
+			
+			# Check if the phrase is at word boundary (preceded by space, comma, or start of string)
+			if pos == 0 or cleaned_lower[pos-1] in [' ', ',', '-', '(']:
+				# Additional check: make sure we're not cutting off too much of a short title
+				if len(before_phrase) >= 10:  # Keep at least 10 characters of the main title
+					cleaned_title = cleaned_title[:pos].strip()
+					cleaned_lower = cleaned_title.lower()
+					break  # Stop after first match to avoid over-trimming
+	
+	# Clean up any trailing punctuation and whitespace
+	cleaned_title = cleaned_title.rstrip(' ,-()').strip()
+	
+	return cleaned_title

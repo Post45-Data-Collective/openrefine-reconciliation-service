@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FlaskApp</title>
+
+    <script src="/static/vue.global.js"></script>
+    <link rel="stylesheet" href="/static/bulma.min.css" />
+
+</head>
+<body>
+    
+    <style>
+        /* Optional: Make columns take full height */
+        html, body {
+            height: 100%;
+        }
+        
+        /* Light mode (default) */
+        @media (prefers-color-scheme: light) {
+            html, body {
+                background-color: #f5f5f5;
+                color: #4a4a4a;
+            }
+        }
+        
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            html, body {
+                background-color: #1a1a1a;
+                color: #dbdbdb;
+            }
+        }
+        .main-columns {
+            min-height: 100vh; /* Ensure columns try to fill viewport height */
+             display: flex; /* Use flexbox for better height handling */
+        }
+        .sidebar-column {
+            display: flex;
+            flex-direction: column; /* Ensure sidebar content stacks vertically */
+        }
+        
+        @media (prefers-color-scheme: light) {
+            .sidebar-column {
+                background-color: #fff;
+            }
+            .main-content-column {
+                background-color: #f5f5f5;
+            }
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .sidebar-column {
+                background-color: #242424;
+            }
+            .main-content-column {
+                background-color: #1a1a1a;
+            }
+            .menu-label {
+                color: #b5b5b5;
+            }
+            .menu-list a {
+                color: #dbdbdb;
+            }
+            .menu-list a:hover {
+                background-color: #363636;
+                color: #fff;
+            }
+            .menu-list a.is-active {
+                background-color: #3273dc;
+                color: #fff;
+            }
+            .menu-list svg {
+                fill: white;
+            }
+        }
+        
+        .main-content-column {
+            overflow-y: auto; /* Allow scrolling if content overflows */
+        }
+        .menu {
+             padding: 1rem; /* Add some padding around the menu */
+        }
+
+        /* Make sidebar sticky if desired (more advanced) */
+        /*
+        .sidebar-column {
+             position: sticky;
+             top: 0;
+             height: 100vh;
+             overflow-y: auto;
+        }
+        */
+
+
+
+
+        .menu-list img{
+            height: 20px;
+            width: auto;
+            vertical-align: bottom;
+            margin-right: 0.5em;
+        }
+        .menu-list svg{
+
+            padding: 0;
+            margin: 0;
+            height: 20px;
+            padding-right: 5px;
+
+        }
+
+        .cluster-option{
+            height: 100%;
+            text-align: center;
+
+        }
+
+        .cluster-option svg{
+            display: block;
+            width: 25%;
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cluster-option div{
+            height: 100%;
+            /* align-items: center; */
+            padding: 1em;
+            border-radius: 1em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        @media (prefers-color-scheme: light) {
+            .cluster-option div {
+                background-color: whitesmoke;
+            }
+            .cluster-option div:hover {
+                background-color: #f0f0f0;
+                cursor: pointer;
+            }
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .cluster-option div {
+                background-color: #2a2a2a;
+            }
+            .cluster-option div:hover {
+                background-color: #363636;
+                cursor: pointer;
+            }
+            .cluster-option p {
+                color: #dbdbdb;
+            }
+            .cluster-option ul {
+                color: #dbdbdb;
+            }
+        }
+         .cluster-option p{
+            font-weight: bold;
+         }
+         .cluster-option ul{
+            list-style: square;
+            text-align: left;
+         
+         }
+         .cluster-option strong{
+            font-family: monospace;
+         }
+
+         .cluster-link {
+            text-decoration: underline;
+            color: black;
+         }
+         @media (prefers-color-scheme: dark) {
+            .cluster-link {
+                color: white;
+            }
+         }
+         .radio-group{
+            margin-top: auto;
+            padding-top: 1em;
+         }
+         .cluster-option .is-active{
+            border: solid 1px #3273dc;
+         }
+         
+         @media (prefers-color-scheme: dark) {
+            .cluster-option .is-active {
+                border: solid 1px #485fc7;
+            }
+            .cluster-option svg path {
+                fill: white;
+                stroke: white;
+            }
+            .cluster-option .is-active svg {
+                filter: drop-shadow(0 0 10px #66b3ff) drop-shadow(0 0 20px #3399ff) drop-shadow(0 0 30px #0080ff);
+            }
+            .box {
+                background-color: #242424;
+                color: #dbdbdb;
+            }
+            .title, .subtitle {
+                color: #dbdbdb;
+            }
+            .content {
+                color: #dbdbdb;
+            }
+            pre {
+                background-color: #2a2a2a;
+                color: #dbdbdb;
+            }
+            code {
+                background-color: #2a2a2a;
+                color: #dbdbdb;
+            }
+            .table {
+                background-color: #242424;
+                color: #dbdbdb;
+            }
+            .table th {
+                color: #dbdbdb;
+                border-color: #363636;
+            }
+            .table td {
+                color: #dbdbdb;
+                border-color: #363636;
+            }
+            .table.is-striped tbody tr:nth-child(even) {
+                background-color: #2a2a2a;
+            }
+            .table.is-hoverable tbody tr:hover {
+                background-color: #363636;
+            }
+            .input, .textarea {
+                background-color: #2a2a2a;
+                color: #dbdbdb;
+                border-color: #363636;
+            }
+            .input::placeholder, .textarea::placeholder {
+                color: #7a7a7a;
+            }
+            .label {
+                color: #dbdbdb;
+            }
+            .help {
+                color: #b5b5b5;
+            }
+            .notification {
+                background-color: #2a2a2a;
+                color: #dbdbdb;
+            }
+            .notification.is-primary {
+                background-color: #00d1b2;
+                color: #fff;
+            }
+            .notification.is-info {
+                background-color: #3298dc;
+                color: #fff;
+            }
+            .notification.is-success {
+                background-color: #48c774;
+                color: #fff;
+            }
+            .notification.is-warning {
+                background-color: #ffdd57;
+                color: rgba(0,0,0,.7);
+            }
+            .notification.is-danger {
+                background-color: #f14668;
+                color: #fff;
+            }
+            .button {
+                background-color: #363636;
+                color: #dbdbdb;
+                border-color: #4a4a4a;
+            }
+            .button:hover {
+                background-color: #4a4a4a;
+                color: #fff;
+            }
+            .button.is-primary {
+                background-color: #00d1b2;
+                color: #fff;
+            }
+            .button.is-primary:hover {
+                background-color: #00c4a7;
+            }
+         }
+         .cluster-option-content{
+            border: solid 1px transparent;
+         }
+        /* Clickable tag hover effects */
+        .tag.is-clickable:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+            transition: all 0.2s ease;
+        }
+        
+        .tag.is-clickable {
+            transition: all 0.2s ease;
+        }
+        
+        .tag.is-clickable:active {
+            transform: scale(0.95);
+        }
+    </style>
+
+
+
+    <div id="app">
+
+        <div class="columns main-columns is-gapless">
+
+            <!-- Sidebar -->
+            <div class="column is-one-quarter sidebar-column">
+                <aside class="menu p-4">
+                    <p class="menu-label">
+                        <ul class="menu-list">
+                        <li>
+                           
+                            <a :class="{'is-active': (activeTab=='home')}" href="#" @click.prevent="activeTab = 'home'">
+                            <svg width="30px" height="30px" version="1.1" viewBox="15 10 70 70" xmlns="http://www.w3.org/2000/svg">
+                            <g>
+                            <path d="m37.918 41.875 3.75 2.707 2.918-2.918-2.707-3.75c0.625-1.043 1.25-2.5 1.457-3.75l4.582-0.83203v-4.168l-4.582-0.83203c-0.41797-1.25-0.83203-2.707-1.457-3.75l2.707-3.75-2.918-2.918-3.75 2.707c-1.043-0.625-2.5-1.25-3.75-1.457l-0.83594-4.582h-4.168l-0.83203 4.582c-1.25 0.41797-2.707 0.83203-3.75 1.457l-3.75-2.707-2.918 2.918 2.707 3.75c-0.625 1.043-1.25 2.5-1.457 3.75l-4.582 0.83594v4.168l4.582 0.83203c0.41797 1.25 0.83203 2.707 1.457 3.75l-2.707 3.75 2.918 2.918 3.75-2.707c1.043 0.625 2.5 1.25 3.75 1.457l0.83594 4.582h4.168l0.83203-4.582c1.25-0.21094 2.5-0.83594 3.75-1.4609zm-12.918-10.625c0-3.543 2.707-6.25 6.25-6.25s6.25 2.707 6.25 6.25-2.707 6.25-6.25 6.25-6.25-2.707-6.25-6.25z"/>
+                            <path d="m73.332 68.957 7.5 2.082 2.293-5.832-6.457-3.543c0.20703-1.457 0.41797-3.125 0.20703-4.582l6.25-3.543-2.5-5.832-6.25 1.668c-1.043-1.668-2.293-2.918-3.543-3.957l1.668-6.043-5.832-2.293-2.918 5c-1.875-0.41797-3.957-0.41797-6.043-0.20703l-2.918-5-5.6211 2.707 1.457 5.418c-1.668 1.25-3.125 2.707-4.168 4.375l-5.625-1.457-2.293 5.832 5.418 3.125c-0.20703 1.875 0 3.543 0.20703 5.418l-5.625 3.332 2.5 5.832 6.875-1.875c1.043 1.25 2.082 2.293 3.543 3.125l-1.875 7.082 5.832 2.293 3.75-6.668c1.25 0.20703 2.707 0 3.957-0.20703l3.957 6.875 5.832-2.5-2.082-7.5c0.62891-1.0391 1.6719-2.082 2.5039-3.125zm-21.25-10.625c0-4.582 3.75-8.332 8.332-8.332 4.582 0 8.332 3.75 8.332 8.332s-3.75 8.332-8.332 8.332c-4.582 0.003907-8.332-3.7461-8.332-8.332z"/>
+                            </g>
+                            </svg>                                 
+                                <span>Main</span>
+                            </a>
+                        </li>
+                    </ul>
+                    </p>
+                    <p class="menu-label">
+                        Service Configuration
+                    </p>
+                    <ul class="menu-list">
+                        <li><a :class="{'is-active': (activeTab=='hathitrust')}" href="#" @click.prevent="activeTab = 'hathitrust'"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEPUlEQVRYw72XW2xURRjHf3Ouu2dZsUVaIFilFCTcUlChIEGIQRCBipoYMDGGB2LUFxvEEC/RxGAkkcTEF43BBIKEiIEXqxYjXtAlFFJFbCC2ULCxUpcWaPdy9pwz40M3lQpu9zRb53nm+//mu8x8n0g2VApgLrAVWAvEGd11FfgM2AGcMvLiu4B5gGD011hgAzAD2KTlbz5ycaGBpoc+ldfcagBrRiSuGeiV07Br14FSZBO7kdcugVJhINYawC2h0A0bffJc7PnrMarrUH3dCCuGMW0JfsdJgq5WZG8nKvCRvZ3Iq12FzMWN4oUtjOo67HufwJg0C/+PVjKN2/HONyPsGOZd92PWLMGcsgAMC6GbBMlzpD7dNuCZ/7KbbKgc1mciEie6/Dms2avwOprJtRzEv9CC8jJDN+omIhJHmFG0WDlO/esEXWdIN25HuamRAQgzQnTlFszqOtJNO/HajoKfK8pr5tTFxNa/Sfb4PrJHPwLp35hKwxqZ+SDWzBWkP38b78yRosUBvHPHyHz3AZGFT2LNWHbTXC8IIKwo9vxHyJ3+Eq/9R0CFLBWFf74ZmbpMdOUW9AnTwwFo5VXot1XjnT0CMghX6M6tRJZuZszG9xBWjKC7Db2iZuDduG4VrALNKUNJn6CnE3STyH1P41/8Cb+jOb9BHzAYeEPPlU3GWb0NvaIG99hecq2HkX1/3TQHCpehbuY9KRFCoDllCCs6+AJGFj2FsGNkvn1/EEIfdwdO/RsgNPr3NxB0tRZ8nAoDiH+SRvk50od3gpSDULK3E2fta8hUD+7JA2hOGc6aV0EpUodeQfZcHDZURqjABv7QPwAFuomz4gWMqnkIM4qIV5A68GJR4uEBrvsH7PmPEln2DF5rE975Zqw5D6GXV5FufIvgz7NFmwoPIDTs2nqiy58lm9iDe/xjVC6D92sTIhJHpntCmQsNYNx5D9EHnsdt3k82sXsw+ZTvovrd0PcpHkAIjEmzcR5+Ga/jBNnEnhvKbyTLuNkNlZtC9vw+UIZCQx9XhTVnNfbCDQhNJ/X9hyi3vyTtkfHvurdr6zGnLUH2XwbdRBs7kdjjO1B+Di0+nuzRXQSXfitZfzYUIPBIN72DcfoLtPLbMSbORBs7gcxX76LcfpzV2/DOfgNKjhIAoNJX8Np+AEBOX4pRsxivPYE1awWyP0nQ3V7SDlUrdqM+fipBsqNksQ8NgNDAy5bU/cOX4XVi/oWTA8RjxmFUL8JvTyBTl0cXQKZ6EZqBXlmD23IQENh3P0Zk6Wb6On+GUQfobsM7l8BZ9RLuhBkIw8aqXUful0bkla6ShEAkGyqvFpoNtHgFdt1GzCkLUFLinfka98QnqGxfSeZEkWyo3Juf1UShZ1iYEVAK5bthpp/CDSPs0/JTakvBjlMpVC6D8rKlFG8BdmjAKWATsA+49j9Mx9fyWpuAU38D8K+c8oWH2d8AAAAASUVORK5CYII="/> HathiTrust</a></li>
+                        <li><a :class="{'is-active': (activeTab=='loc')}" href="#" @click.prevent="activeTab = 'loc'"><img src="data:image/png;base64,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"/>Library of Congress</a></li>
+                        <li><a :class="{'is-active': (activeTab=='google')}" href="#" @click.prevent="activeTab = 'google'"><img src="data:image/png;base64,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"/>Google Books</a></li>
+                        <li><a :class="{'is-active': (activeTab=='worldcat')}" href="#" @click.prevent="activeTab = 'worldcat'"><img src="data:image/png;base64,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"/>Worldcat</a></li>
+                        <li><a :class="{'is-active': (activeTab=='viaf')}" href="#" @click.prevent="activeTab = 'viaf'"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGEAAABjCAIAAAAErPn/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAGF2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4xLWMwMDIgNzkuYTFjZDEyZjQxLCAyMDI0LzExLzA4LTE2OjA5OjIwICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpwaG90b3Nob3A9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGhvdG9zaG9wLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OENBNzEyNzA5RTk2MTFFNDkyRjdERDVGQ0UwRDY4QUYiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MDgyZmNiNjQtMDJhMy00OWNiLThjOTktNTg4ODcyZDdhNzdmIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6OENBNzEyNzA5RTk2MTFFNDkyRjdERDVGQ0UwRDY4QUYiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgSWxsdXN0cmF0b3IgQ1MzIiB4bXA6Q3JlYXRlRGF0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"/>VIAF</a></li>
+                    </ul>
+                    <!-- <p class="menu-label">
+                        Administration
+                    </p>
+                    <ul class="menu-list">
+                        <li><a href="#team-settings">Team Settings</a></li>
+                        <li>
+                            <a href="#manage-team">Manage Your Team</a>
+                            <ul>
+                                <li><a href="#members">Members</a></li>
+                                <li><a href="#plugins">Plugins</a></li>
+                                <li><a href="#add-member">Add a member</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#invitations">Invitations</a></li>
+                    </ul>
+                    <p class="menu-label">
+                        Transactions
+                    </p>
+                    <ul class="menu-list">
+                        <li><a href="#payments">Payments</a></li>
+                        <li><a href="#transfers">Transfers</a></li>
+                        <li><a href="#balance">Balance</a></li>
+                    </ul>
+                     <p class="menu-label">
+                        Account
+                    </p>
+                     <ul class="menu-list">
+                        <li><a href="#settings">Settings</a></li>
+                        <li><a href="#logout">Logout</a></li>
+                     </ul> -->
+
+
+                    <p class="menu-label">
+                        Tools
+                    </p>
+                    <ul class="menu-list">
+                        <li><a :class="{'is-active': (activeTab=='output')}" href="#" @click.prevent="activeTab = 'output'">Output Data</a></li>
+                    </ul>
+
+
+
+                </aside>
+            </div>
+    
+            <!-- Main Content -->
+            <div class="column main-content-column">
+
+                <section class="section" v-if="activeTab=='home'">
+                    <div class="container">
+                        <h1 class="title">POST45 Open Refine Service</h1>
+                        <h2 class="subtitle">
+                            Configuration and Tools
+                        </h2>
+    
+                        <div class="box">
+                            <p>Welcome! The service is running at:</p>
+                            <p><strong><code>http://127.0.0.1:5001/api/v1/reconcile</code></strong> <a href="#" @click.prevent="copyToClipboard($event,'http://127.0.0.1:5001/api/v1/reconcile')" style="font-size: 0.75em;" >copy</a></p>
+                        </div>
+    
+
+                        <div class="box">
+
+                            <label class="label">Main Config Options</label>
+
+                            <hr>
+                            <p style="padding-bottom: 1em;">Title Matching Behavior:</p>
+                            <div class="columns">
+                                <div class="column">
+                                    <div class="is-flex is-justify-content-center is-align-items-center cluster-option"  >
+                                        <!-- Content of the centered div -->
+                                        <div :class="{'is-active': (matchMode=='single')}" @click="matchMode='single'" class="cluster-option-content">
+                                            <div>
+                                                <svg  version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                                    <defs v-if="matchMode=='single'">
+                                                        <filter id="blue-glow" x="-50%" y="-50%" width="200%" height="200%">
+                                                            <feFlood result="flood" flood-color="#3273dc" flood-opacity="0.7"/>
+                                                            <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"/>
+                                                            <feGaussianBlur in="mask" result="blurred" stdDeviation="3"/>
+                                                            <feMerge>
+                                                                <feMergeNode in="blurred"/>
+                                                                <feMergeNode in="SourceGraphic"/>
+                                                            </feMerge>
+                                                        </filter>
+                                                    </defs>
+                                                <path d="m25.797 87.23h2.4961v6.1875c0 0.54688 0.29688 1.0508 0.76953 1.3164 0.47656 0.26953 1.0625 0.25781 1.5273-0.027344l5.8398-3.5508 5.9297 3.6172c0.24219 0.15234 0.51562 0.22656 0.78906 0.22656 0.25391 0 0.51172-0.0625 0.73828-0.19141 0.47656-0.26953 0.77344-0.77344 0.77344-1.3203v-6.2578h29.539c5.043 0 9.1445-4.1016 9.1445-9.1445v-25.227l0.003906-38.715c0-5.043-4.1016-9.1445-9.1445-9.1445h-48.406c-5.043 0-9.1445 4.1016-9.1445 9.1445v63.941c0 5.043 4.1016 9.1445 9.1445 9.1445zm15.84 3.5625l-4.418-2.6953c-0.48438-0.29688-1.0898-0.29688-1.5742 0l-4.3281 2.6328 0.003906-10.633h10.316zm38.688-12.707c0 3.375-2.7461 6.1211-6.1211 6.1211h-29.543v-4.1133l30.078 0.003906c2.1328 0 4.0781-0.78125 5.5859-2.0703zm-50.648-70.062h44.527c3.375 0 6.1211 2.7461 6.1211 6.1211v49.117c0 3.0781-2.5039 5.5859-5.5859 5.5859h-45.062zm-10 6.1211c0-3.375 2.7461-6.1211 6.1211-6.1211h0.85156v60.824h-1.3867c-2.1328 0-4.0781 0.78125-5.5859 2.0703zm0 63.309c0-3.0781 2.5039-5.5859 5.5859-5.5859h49.48c2.1328 0 4.0781-0.78125 5.5859-2.0703v1.6875c0 3.0781-2.5039 5.5859-5.5859 5.5859h-49.48c-0.83594 0-1.5117 0.67578-1.5117 1.5117 0 0.83594 0.67578 1.5117 1.5117 1.5117h3.0352v4.1133h-2.4961c-3.375 0-6.1211-2.7461-6.1211-6.1211z" filter="url(#blue-glow)"/>
+                                                </svg>
+
+                                                <p>Single Match Mode</p>
+                                                <ul>
+                                                    <li>Matches to the best <a href="https://en.wikipedia.org/wiki/Functional_Requirements_for_Bibliographic_Records" target="_blank" class="cluster-link">Manifestation</a> it can find</li>
+                                                    <li>Pass <strong>Title</strong> and <strong>Author</strong> to get best match</li>
+                                                    <li>If passed <strong>Publication Year</strong> it will try to match the desired edition</li>
+                                                </ul>
+
+                                                <p class="radio-group">
+                                                    <label class="radio">
+                                                        <input type="radio" name="match_mode" value="single" v-model="matchMode">
+                                                        Use Single Match Mode
+                                                    </label>
+                                                </p>
+                                            </div>
+                                            <!-- <h3 class="title is-7">POST45</h3>
+                                            <p class="subtitle">Configure the POST45 Reconciliation Service</p> -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <div class="is-flex is-justify-content-center is-align-items-center cluster-option"  >
+                                        <!-- Content of the centered div -->
+                                        <div :class="{'is-active': (matchMode=='cluster')}" @click="matchMode='cluster'" class="cluster-option-content">
+                                            <div>
+                                                <svg version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                                    <defs v-if="matchMode=='cluster'">
+                                                        <filter id="blue-glow2" x="-50%" y="-50%" width="200%" height="200%">
+                                                            <feFlood result="flood" flood-color="#3273dc" flood-opacity="0.7"/>
+                                                            <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"/>
+                                                            <feGaussianBlur in="mask" result="blurred" stdDeviation="3"/>
+                                                            <feMerge>
+                                                                <feMergeNode in="blurred"/>
+                                                                <feMergeNode in="SourceGraphic"/>
+                                                            </feMerge>
+                                                        </filter>
+                                                    </defs>
+
+
+                                                <path d="m15.195 92.938v-17.16c0-0.57031 0.46094-1.0312 1.0312-1.0312h67.547c0.57031 0 1.0312 0.46094 1.0312 1.0312v17.16h4.4922c0.71094 0 1.3555-0.28906 1.8203-0.75781 0.46875-0.46875 0.75781-1.1133 0.75781-1.8203l0.003906-80.719c0-0.71094-0.28906-1.3555-0.75781-1.8203-0.46875-0.46875-1.1133-0.75781-1.8203-0.75781h-78.598c-0.71094 0-1.3555 0.28906-1.8203 0.75781-0.46875 0.46875-0.75781 1.1133-0.75781 1.8203v80.719c0 0.71094 0.28906 1.3555 0.75781 1.8203 0.46875 0.46875 1.1133 0.75781 1.8203 0.75781zm1.0312-77.531h67.547c0.57031 0 1.0312 0.46094 1.0312 1.0312v21.027c0 0.57031-0.46094 1.0312-1.0312 1.0312l-67.547 0.003906c-0.57031 0-1.0312-0.46094-1.0312-1.0312v-21.027c0-0.57031 0.46094-1.0312 1.0312-1.0312zm0 29.102h67.547c0.57031 0 1.0312 0.46094 1.0312 1.0312v21.027c0 0.57031-0.46094 1.0312-1.0312 1.0312l-67.547 0.003906c-0.57031 0-1.0312-0.46094-1.0312-1.0312v-21.027c0-0.57031 0.46094-1.0312 1.0312-1.0312zm66.516 41.254h-65.484v8.2109c0 0.57031-0.46094 1.0312-1.0312 1.0312h-5.5234c-1.2773 0-2.4375-0.52344-3.2773-1.3633-0.83984-0.83984-1.3633-2.0039-1.3633-3.2773v-80.723c0-1.2773 0.52344-2.4375 1.3633-3.2773 0.83984-0.83984 2-1.3633 3.2773-1.3633h78.594c1.2773 0 2.4375 0.52344 3.2773 1.3633 0.83984 0.83984 1.3633 2 1.3633 3.2773v80.719c0 1.2773-0.52344 2.4375-1.3633 3.2773-0.83984 0.83984-2.0039 1.3633-3.2773 1.3633h-5.5234c-0.57031 0-1.0312-0.46094-1.0312-1.0312v-8.2109zm-65.484-2.0625v-6.8906h65.484v6.8906zm31.711-18.16h-31.711v-18.969h31.711zm2.0625-18.969h31.715v18.969h-31.715zm-2.0625-10.133h-31.711v-18.969h31.711zm2.0625-18.969h31.715v18.969h-31.715zm-24.234 10.516c-0.57031 0-1.0312-0.46094-1.0312-1.0312s0.46094-1.0312 1.0312-1.0312h12.004c0.57031 0 1.0312 0.46094 1.0312 1.0312s-0.46094 1.0312-1.0312 1.0312zm34.406 0c-0.57031 0-1.0312-0.46094-1.0312-1.0312s0.46094-1.0312 1.0312-1.0312h12.004c0.57031 0 1.0312 0.46094 1.0312 1.0312s-0.46094 1.0312-1.0312 1.0312zm-34.406 29.102c-0.57031 0-1.0312-0.46094-1.0312-1.0312 0-0.57031 0.46094-1.0312 1.0312-1.0312h12.004c0.57031 0 1.0312 0.46094 1.0312 1.0312 0 0.57031-0.46094 1.0312-1.0312 1.0312zm34.406 0c-0.57031 0-1.0312-0.46094-1.0312-1.0312 0-0.57031 0.46094-1.0312 1.0312-1.0312h12.004c0.57031 0 1.0312 0.46094 1.0312 1.0312 0 0.57031-0.46094 1.0312-1.0312 1.0312z" fill-rule="evenodd" filter="url(#blue-glow2)"/>
+                                                </svg>
+
+                                                <p>Cluster Match Mode</p>
+                                                <ul>
+                                                    <li>Will build a cluster of matching <a href="https://en.wikipedia.org/wiki/Functional_Requirements_for_Bibliographic_Records" target="_blank" class="cluster-link">Manifestations</a> which represent the work as a whole</li>
+                                                    <li>Pass <strong>Title</strong> and <strong>Author</strong> to get best match</li>
+                                                    <li>Best mode to deal with works that have many editions</li>
+                                                    <li>Best mode to gather as many identifiers as possible</li>
+
+                                                </ul>
+
+                                                <p class="radio-group">
+                                                    <label class="radio">
+                                                        <input type="radio" name="match_mode" value="cluster" v-model="matchMode">
+                                                        Use Cluster Match Mode
+                                                    </label>
+                                                </p>
+                                            </div>
+                                            <!-- <h3 class="title is-7">POST45</h3>
+                                            <p class="subtitle">Configure the POST45 Reconciliation Service</p> -->
+                                        </div>
+                                    </div>
+
+
+
+
+
+                                </div>
+                            </div>
+
+                            <p style="padding-bottom: 1em;">Extend Data Behavior:</p>
+
+                            <div class="columns">
+                                <div class="column">
+                                    <div class="is-flex is-justify-content-center is-align-items-center cluster-option"  >
+                                        <!-- Content of the centered div -->
+                                        <div :class="{'is-active': (dataExtendMode=='join')}" @click="dataExtendMode='join'" class="cluster-option-content">
+                                            <div>
+                                                
+                                                
+
+                                                <p style="margin-bottom: 1em;">Join Mode</p>
+                                                <span class="has-text-weight-bold">
+                                                    123456789 | 987654321 | 192837465 | 564738291
+                                                </span>
+                                                <ul style="margin-top: 1em;">
+                                                    <li>When extending data (adding ISBN, LCCN, OCLC, etc..) values will be in the same field seperated by a pipe "|" character</li>
+                                                </ul>
+
+                                                <p class="radio-group">
+                                                    <label class="radio">
+                                                        <input type="radio" name="data_extend_mode" value="join" v-model="dataExtendMode">
+                                                        Use Join Mode
+                                                    </label>
+                                                </p>
+                                            </div>
+                                            <!-- <h3 class="title is-7">POST45</h3>
+                                            <p class="subtitle">Configure the POST45 Reconciliation Service</p> -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <div class="is-flex is-justify-content-center is-align-items-center cluster-option"  >
+                                        <!-- Content of the centered div -->
+                                        <div :class="{'is-active': (dataExtendMode=='row')}" @click="dataExtendMode='row'" class="cluster-option-content">
+                                            <div>
+                                               
+                                                
+
+                                                <p>New Row Mode</p>
+
+                                                <span class="has-text-weight-bold" style="border-bottom: 1px solid; display: block;">
+                                                   123456789
+                                                </span>
+                                                <span class="has-text-weight-bold" style="border-bottom: 1px solid; display: block;">
+                                                    987654321
+                                                </span>
+                                                <span class="has-text-weight-bold" style="border-bottom: 1px solid; display: block;">
+                                                    192837465
+                                                </span>
+                                                <span class="has-text-weight-bold" style="border-bottom: 1px solid; display: block;">
+                                                    564738291
+                                                </span>                                                                                     
+                                                <ul>
+                                                    <li>When extending data (adding ISBN, LCCN, OCLC, etc..) values will be in a new row for each value</li>
+
+
+                                                </ul>
+
+                                                <p class="radio-group">
+                                                    <label class="radio">
+                                                        <input type="radio" name="data_extend_mode" value="row" v-model="dataExtendMode">
+                                                        Use Row Mode
+                                                    </label>
+                                                </p>
+                                            </div>
+                                            <!-- <h3 class="title is-7">POST45</h3>
+                                            <p class="subtitle">Configure the POST45 Reconciliation Service</p> -->
+                                        </div>
+                                    </div>
+
+
+
+
+
+                                </div>
+                            </div>
+
+                            <p style="padding-bottom: 1em; padding-top: 2em;">Remove Subtitle from Titles:</p>
+
+                            <div class="columns">
+                                <div class="column">
+                                    <div class="is-flex is-justify-content-center is-align-items-center cluster-option"  >
+                                        <!-- Content of the centered div -->
+                                        <div :class="{'is-active': (removeSubtitle==false)}" @click="removeSubtitle=false" class="cluster-option-content">
+                                            <div>
+                                                
+                                                
+
+                                                <p style="margin-bottom: 1em;">Keep Subtitles</p>
+
+                                                <ul>
+                                                    <li>Placeholder text for keep subtitles description</li>
+
+                                                </ul>
+
+                                                <p class="radio-group">
+                                                    <label class="radio">
+                                                        <input type="radio" name="remove_subtitle" value="false" v-model="removeSubtitle">
+                                                        Keep Subtitles
+                                                    </label>
+                                                </p>
+                                            </div>
+                                            <!-- <h3 class="title is-7">POST45</h3>
+                                            <p class="subtitle">Configure the POST45 Reconciliation Service</p> -->
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="column">
+                                    <div class="is-flex is-justify-content-center is-align-items-center cluster-option"  >
+                                        <!-- Content of the centered div -->
+                                        <div :class="{'is-active': (removeSubtitle==true)}" @click="removeSubtitle=true" class="cluster-option-content">
+                                            <div>
+                                               
+                                                
+
+                                                <p>Remove Subtitles</p>
+
+                                                <ul>
+                                                    <li>Placeholder text for remove subtitles description</li>
+
+
+                                                </ul>
+
+                                                <p class="radio-group">
+                                                    <label class="radio">
+                                                        <input type="radio" name="remove_subtitle" value="true" v-model="removeSubtitle">
+                                                        Remove Subtitles
+                                                    </label>
+                                                </p>
+                                            </div>
+                                            <!-- <h3 class="title is-7">POST45</h3>
+                                            <p class="subtitle">Configure the POST45 Reconciliation Service</p> -->
+                                        </div>
+                                    </div>
+
+
+
+
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+                        <!-- <div class="notification is-info is-light">
+                            Bulma columns are responsive by default. On narrow screens (like mobile), the columns will stack vertically. The sidebar will appear above the main content unless you add `is-mobile` to the `columns` div or use custom CSS.
+                        </div>
+    
+                         <div class="box">
+                            <h3 class="title is-4">More Content</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p><strong>End of content example.</strong></p>
+                        </div> -->
+    
+                    </div>
+                </section>
+
+                <section class="section" v-if="activeTab=='hathitrust'">
+                    <div class="container">
+                        <h2 class="subtitle">
+                            HathiTrust Database Management
+                        </h2>
+
+                        <div class="columns">
+                            <div class="column">
+                                <div class="box">
+                                    <h3 class="title is-5">Database Status</h3>
+                                    <div v-if="buildStatus.status != 'complete'" class="notification is-warning"> 
+                                        HathiTrust database is being built or updated.
+                                    </div>
+                                    <div v-else-if="hathiDbExists" class="notification is-success">
+                                        HathiTrust database exists and is ready to use.
+                                    </div>
+                                    <div v-else class="notification is-warning">
+                                        HathiTrust database does not exist. You need to build it first.
+                                    </div>
+                                    
+                                    <div v-if="buildStatus && buildStatus.status !== 'idle'" class="mt-4">
+                                        <h4 class="title is-6">Build Progress</h4>
+                                        <div :class="{
+                                            'notification': true,
+                                            'is-info': buildStatus.status === 'processing' || buildStatus.status === 'starting' || buildStatus.status === 'preparing',
+                                            'is-success': buildStatus.status === 'complete',
+                                            'is-danger': buildStatus.status === 'error'
+                                        }">
+                                            <p><strong>Status:</strong> ${buildStatus.status}$</p>
+                                            <p><strong>Message:</strong> ${buildStatus.message}$</p>
+                                            <p v-if="buildStatus.progress"><strong>Progress:</strong> ${buildStatus.progress}$ 
+
+                                            <template v-if="buildStatus.status  == 'downloading'">
+                                                Bytes Downloaded
+                                            </template>
+                                            <template v-else-if="buildStatus.status == 'processing'">
+                                                Rows Processed
+                                            </template>
+                                                
+                                            
+                                            </p>
+                                            <p v-if="buildStatus.timestamp"><strong>Last Update:</strong> ${formatTimestamp(buildStatus.timestamp)}$</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button 
+                                            @click="buildHathiDatabase" 
+                                            :disabled="isBuilding"
+                                            :class="{
+                                                'button': true,
+                                                'is-primary': !isBuilding,
+                                                'is-loading': isBuilding
+                                            }">
+                                            ${isBuilding ? 'Building...' : 'Build Database'}$
+                                        </button>
+                                        <button 
+                                            @click="checkBuildStatus" 
+                                            class="button is-info ml-2">
+                                            Refresh Status
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="box">
+                                    <h3 class="title is-5">Instructions</h3>
+                                    <div class="content">
+                                        <ol>
+                                            <li>Click "Build Database" to start the automated process</li>
+                                            <li>The system will automatically find and download the latest HathiTrust data file</li>
+                                            <li>You should have 5GB of free disk space available</li>
+                                            <li>The file will be processed and imported into the database</li>
+                                            <li>The process may take several minutes depending on file size and internet speed</li>
+                                            <li>Temporary files will be automatically cleaned up after completion</li>
+                                            <li>Once complete, the database will be ready for reconciliation</li>
+                                        </ol>
+                                        <p class="has-text-weight-semibold">Note:</p>
+                                        <p>The database file will be created at <code>data/hathi/hathitrust.db</code></p>
+                                        <p>No manual file downloads or placement required - everything is automated!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+    
+                        <!-- <div class="notification is-info is-light">
+                            Bulma columns are responsive by default. On narrow screens (like mobile), the columns will stack vertically. The sidebar will appear above the main content unless you add `is-mobile` to the `columns` div or use custom CSS.
+                        </div>
+    
+                         <div class="box">
+                            <h3 class="title is-4">More Content</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur ad</div>ipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p><strong>End of content example.</strong></p>
+                        </div> -->
+    
+                    </div>
+                </section>
+
+                <section class="section" v-if="activeTab=='worldcat'">
+                    <div class="container">
+                        <h2 class="subtitle">
+                            WorldCat (OCLC) Configuration
+                        </h2>
+
+                        <div class="box">
+                            <h3 class="title is-5">OCLC API Credentials</h3>
+                            <div class="notification is-info is-light" v-if="oclcKeysSetViaEnv">
+                                <p><strong>Note:</strong> OCLC credentials are currently set via environment variables.</p>
+                            </div>
+                            
+                            <div class="field">
+                                <label class="label">OCLC Client ID</label>
+                                <p class="help">Enter your OCLC API Client ID</p>
+                                <div class="control">
+                                    <input class="input" 
+                                           type="text" 
+                                           v-model="oclcClientId"
+                                           :disabled="oclcKeysSetViaEnv"
+                                           :placeholder="oclcKeysSetViaEnv ? 'Set via environment variable' : 'Enter OCLC Client ID'">
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">OCLC Secret</label>
+                                <p class="help">Enter your OCLC API Secret</p>
+                                <div class="control">
+                                    <input class="input" 
+                                           type="text" 
+                                           v-model="oclcSecret"
+                                           :disabled="oclcKeysSetViaEnv"
+                                           :placeholder="oclcKeysSetViaEnv ? 'Set via environment variable' : 'Enter OCLC Secret'">
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="control">
+                                    <button class="button is-link" 
+                                            @click="saveOclcConfig"
+                                            :disabled="oclcKeysSetViaEnv || (!oclcClientId && !oclcSecret)">
+                                        Save OCLC Configuration
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="notification is-warning is-light" v-if="!oclcKeysSetViaEnv && (!oclcClientId || !oclcSecret)">
+                                <p><strong>Warning:</strong> OCLC credentials are not configured. WorldCat reconciliation will not be available until credentials are provided.</p>
+                            </div>
+                        </div>
+
+                        <div class="box">
+                            <h3 class="title is-5">OCLC/WorldCat Reconciliation Settings</h3>
+                            
+                            <div class="field">
+                                <label class="label">Cluster Quality Score</label>
+                                <p class="help">Adjust the clustering quality threshold for OCLC/WorldCat matching</p>
+                                <div class="control">
+                                    <div class="slider-container" style="padding: 20px 10px;">
+                                        <input type="range" 
+                                               class="slider is-fullwidth is-info" 
+                                               min="1" 
+                                               max="5" 
+                                               step="1"
+                                               v-model="oclcClusterQualityScore"
+                                               @change="saveOclcSettings"
+                                               style="width: 100%;">
+                                        <div class="columns is-mobile" style="margin-top: 10px;">
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': oclcClusterQualityScore == 1}"
+                                                      @click="oclcClusterQualityScore = 1; saveOclcSettings()"
+                                                      style="cursor: pointer; user-select: none;">Very Low</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': oclcClusterQualityScore == 2}"
+                                                      @click="oclcClusterQualityScore = 2; saveOclcSettings()"
+                                                      style="cursor: pointer; user-select: none;">Low</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': oclcClusterQualityScore == 3}"
+                                                      @click="oclcClusterQualityScore = 3; saveOclcSettings()"
+                                                      style="cursor: pointer; user-select: none;">Medium</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': oclcClusterQualityScore == 4}"
+                                                      @click="oclcClusterQualityScore = 4; saveOclcSettings()"
+                                                      style="cursor: pointer; user-select: none;">High</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': oclcClusterQualityScore == 5}"
+                                                      @click="oclcClusterQualityScore = 5; saveOclcSettings()"
+                                                      style="cursor: pointer; user-select: none;">Very High</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Books Only Mode</label>
+                                <p class="help">When enabled, only include items with format "Book" in clustering results</p>
+                                <div class="control">
+                                    <label class="checkbox">
+                                        <input type="checkbox" v-model="oclcBookOnly" @change="saveOclcSettings">
+                                        Only include books in OCLC/WorldCat results
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section" v-if="activeTab=='loc'">
+                    <div class="container">
+                        <h2 class="subtitle">
+                            Library of Congress (id.loc.gov) Configuration
+                        </h2>
+
+                        <div class="box">
+                            <div class="field">
+                                <label class="label">Cluster Quality Score</label>
+                                <p class="help">Adjust the clustering quality threshold for id.loc.gov matching</p>
+                                <div class="control">
+                                    <div class="slider-container" style="padding: 20px 10px;">
+                                        <input type="range" 
+                                               class="slider is-fullwidth is-info" 
+                                               min="1" 
+                                               max="5" 
+                                               step="1"
+                                               v-model="idClusterQualityScore"
+                                               style="width: 100%;">
+                                        <div class="columns is-mobile" style="margin-top: 10px;">
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': idClusterQualityScore == 1}"
+                                                      @click="idClusterQualityScore = 1"
+                                                      style="cursor: pointer; user-select: none;">Very Low</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': idClusterQualityScore == 2}"
+                                                      @click="idClusterQualityScore = 2"
+                                                      style="cursor: pointer; user-select: none;">Low</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': idClusterQualityScore == 3}"
+                                                      @click="idClusterQualityScore = 3"
+                                                      style="cursor: pointer; user-select: none;">Medium</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': idClusterQualityScore == 4}"
+                                                      @click="idClusterQualityScore = 4"
+                                                      style="cursor: pointer; user-select: none;">High</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-info': idClusterQualityScore == 5}"
+                                                      @click="idClusterQualityScore = 5"
+                                                      style="cursor: pointer; user-select: none;">Very High</span>
+                                            </div>
+                                        </div>
+                                        <p class="has-text-centered" style="margin-top: 10px;">
+                                            <strong>Current Setting: 
+                                            <span v-if="idClusterQualityScore == 1">Very Low</span>
+                                            <span v-else-if="idClusterQualityScore == 2">Low</span>
+                                            <span v-else-if="idClusterQualityScore == 3">Medium</span>
+                                            <span v-else-if="idClusterQualityScore == 4">High</span>
+                                            <span v-else-if="idClusterQualityScore == 5">Very High</span>
+                                            </strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section" v-if="activeTab=='google'">
+                    <div class="container">
+                        <h2 class="subtitle">
+                            Google Books Configuration
+                        </h2>
+
+
+    
+                        <div class="box">
+                            <div class="field">
+                                <label class="label">Cluster Quality Score</label>
+                                <p class="help">Adjust the clustering quality threshold for Google Books matching</p>
+                                <div class="control">
+                                    <div class="slider-container" style="padding: 20px 10px;">
+                                        <input type="range" 
+                                               class="slider is-fullwidth is-primary" 
+                                               min="1" 
+                                               max="5" 
+                                               step="1"
+                                               v-model="googleClusterQualityScore"
+                                               style="width: 100%;">
+                                        <div class="columns is-mobile" style="margin-top: 10px;">
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-primary': googleClusterQualityScore == 1}"
+                                                      @click="googleClusterQualityScore = 1"
+                                                      style="cursor: pointer; user-select: none;">Very Low</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-primary': googleClusterQualityScore == 2}"
+                                                      @click="googleClusterQualityScore = 2"
+                                                      style="cursor: pointer; user-select: none;">Low</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-primary': googleClusterQualityScore == 3}"
+                                                      @click="googleClusterQualityScore = 3"
+                                                      style="cursor: pointer; user-select: none;">Medium</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-primary': googleClusterQualityScore == 4}"
+                                                      @click="googleClusterQualityScore = 4"
+                                                      style="cursor: pointer; user-select: none;">High</span>
+                                            </div>
+                                            <div class="column has-text-centered">
+                                                <span class="tag is-clickable" 
+                                                      :class="{'is-primary': googleClusterQualityScore == 5}"
+                                                      @click="googleClusterQualityScore = 5"
+                                                      style="cursor: pointer; user-select: none;">Very High</span>
+                                            </div>
+                                        </div>
+                                        <p class="has-text-centered" style="margin-top: 10px;">
+                                            <strong>Current Setting: 
+                                            <span v-if="googleClusterQualityScore == 1">Very Low</span>
+                                            <span v-else-if="googleClusterQualityScore == 2">Low</span>
+                                            <span v-else-if="googleClusterQualityScore == 3">Medium</span>
+                                            <span v-else-if="googleClusterQualityScore == 4">High</span>
+                                            <span v-else-if="googleClusterQualityScore == 5">Very High</span>
+                                            </strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            
+
+
+                        </div>
+    
+                        <!-- <div class="notification is-info is-light">
+                            Bulma columns are responsive by default. On narrow screens (like mobile), the columns will stack vertically. The sidebar will appear above the main content unless you add `is-mobile` to the `columns` div or use custom CSS.
+                        </div>
+    
+                         <div class="box">
+                            <h3 class="title is-4">More Content</h3>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur ad</div>ipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.</p>
+                            <p><strong>End of content example.</strong></p>
+                        </div> -->
+    
+                    </div>
+                </section>
+
+
+
+
+                 <footer class="footer" > <!-- Example Footer -->
+                    <!-- <div class="content has-text-centered">
+                        <p>
+                        <strong>Bulma Sidebar Layout</strong> by You.
+                        </p>
+                    </div> -->
+                </footer>
+            </div>
+    
+        </div>
+
+
+
+        
+    </div>
+
+
+    <script>
+
+        const { createApp } = Vue
+
+        let vue = createApp({
+          delimiters: ["${", "}$"],
+          // for standalone
+          compilerOptions: {
+            delimiters: ["${", "}$"]
+          },          
+          
+
+          watch: {
+            async matchMode(newValue, oldValue) {
+              // Update the server configuration when matchMode changes
+              console.log(`Match mode changed from ${oldValue} to ${newValue}`);
+              
+              try {
+                const response = await fetch('/api/local/set_config', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    POST45_RECONCILIATION_MODE: newValue
+                  })
+                });
+                
+                if (response.ok) {
+                  const result = await response.json();
+                  console.log('Configuration updated successfully:', result);
+                } else {
+                  console.error('Failed to update configuration:', response.status);
+                  // Optionally revert the change if the update failed
+                  // this.matchMode = oldValue;
+                }
+              } catch (error) {
+                console.error('Error updating configuration:', error);
+                // Optionally revert the change if the update failed
+                // this.matchMode = oldValue;
+              }
+            },
+            
+            async dataExtendMode(newValue, oldValue) {
+              // Update the server configuration when dataExtendMode changes
+              console.log(`Data extend mode changed from ${oldValue} to ${newValue}`);
+              
+              try {
+                const response = await fetch('/api/local/set_config', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    POST45_DATA_EXTEND_MODE: newValue
+                  })
+                });
+                
+                if (response.ok) {
+                  const result = await response.json();
+                  console.log('Configuration updated successfully:', result);
+                } else {
+                  console.error('Failed to update configuration:', response.status);
+                  // Optionally revert the change if the update failed
+                  // this.dataExtendMode = oldValue;
+                }
+              } catch (error) {
+                console.error('Error updating configuration:', error);
+                // Optionally revert the change if the update failed
+                // this.dataExtendMode = oldValue;
+              }
+            },
+            
+            async removeSubtitle(newValue, oldValue) {
+              // Update the server configuration when removeSubtitle changes
+              console.log(`Remove subtitle changed from ${oldValue} to ${newValue}`);
+              
+              try {
+                const response = await fetch('/api/local/set_config', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    POST45_REMOVE_SUBTITLE: newValue
+                  })
+                });
+                
+                if (response.ok) {
+                  const result = await response.json();
+                  console.log('Configuration updated successfully:', result);
+                } else {
+                  console.error('Failed to update configuration:', response.status);
+                  // Optionally revert the change if the update failed
+                  // this.removeSubtitle = oldValue;
+                }
+              } catch (error) {
+                console.error('Error updating configuration:', error);
+                // Optionally revert the change if the update failed
+                // this.removeSubtitle = oldValue;
+              }
+            },
+            
+            async idClusterQualityScore(newValue, oldValue) {
+              // Update the server configuration when idClusterQualityScore changes
+              console.log(`ID cluster quality score changed from ${oldValue} to ${newValue}`);
+              
+              // Map numeric values to string values
+              const valueMap = {
+                1: 'very_low',
+                2: 'low',
+                3: 'medium',
+                4: 'high',
+                5: 'very_high'
+              };
+              
+              try {
+                const response = await fetch('/api/local/set_config', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    POST45_ID_CLUSTER_QUALITY_SCORE: valueMap[newValue]
+                  })
+                });
+                
+                if (response.ok) {
+                  const result = await response.json();
+                  console.log('Configuration updated successfully:', result);
+                } else {
+                  console.error('Failed to update configuration:', response.status);
+                  // Optionally revert the change if the update failed
+                  // this.idClusterQualityScore = oldValue;
+                }
+              } catch (error) {
+                console.error('Error updating configuration:', error);
+                // Optionally revert the change if the update failed
+                // this.idClusterQualityScore = oldValue;
+              }
+            },
+            
+            async googleClusterQualityScore(newValue, oldValue) {
+              // Update the server configuration when googleClusterQualityScore changes
+              console.log(`Google cluster quality score changed from ${oldValue} to ${newValue}`);
+              
+              // Map numeric values to string values
+              const valueMap = {
+                1: 'very_low',
+                2: 'low',
+                3: 'medium',
+                4: 'high',
+                5: 'very_high'
+              };
+              
+              try {
+                const response = await fetch('/api/local/set_config', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    POST45_GOOGLE_CLUSTER_QUALITY_SCORE: valueMap[newValue]
+                  })
+                });
+                
+                if (response.ok) {
+                  const result = await response.json();
+                  console.log('Configuration updated successfully:', result);
+                } else {
+                  console.error('Failed to update configuration:', response.status);
+                  // Optionally revert the change if the update failed
+                  // this.googleClusterQualityScore = oldValue;
+                }
+              } catch (error) {
+                console.error('Error updating configuration:', error);
+                // Optionally revert the change if the update failed
+                // this.googleClusterQualityScore = oldValue;
+              }
+            }
+          },
+
+
+
+          data() {
+            // Helper function to convert string values to numbers
+            const getQualityScoreNumber = (value) => {
+              const scoreMap = {
+                'very_low': 1,
+                'low': 2,
+                'medium': 3,
+                'high': 4,
+                'very_high': 5
+              };
+              return scoreMap[value] || 3; // Default to medium
+            };
+            
+            return {
+
+              activeTab: 'home',
+              matchMode: "{{config['POST45_RECONCILIATION_MODE']}}",
+              dataExtendMode: "{{config['POST45_DATA_EXTEND_MODE']}}",
+              removeSubtitle: {{config['POST45_REMOVE_SUBTITLE']|lower}},
+              idClusterQualityScore: getQualityScoreNumber("{{config.get('POST45_ID_CLUSTER_QUALITY_SCORE', 'medium')}}"),
+              googleClusterQualityScore: getQualityScoreNumber("{{config.get('POST45_GOOGLE_CLUSTER_QUALITY_SCORE', 'medium')}}"),
+              hathiDbExists: false,
+              buildStatus: null,
+              isBuilding: false,
+              statusCheckInterval: null,
+              oclcKeysSetViaEnv: {{config.get('POST45_OCLC_KEYS_SET_VIA_ENV', false)|lower}},
+              oclcClientId: "{{config.get('POST45_OCLC_CLIENT_ID', '') if not config.get('POST45_OCLC_KEYS_SET_VIA_ENV', false) else ''}}",
+              oclcSecret: "{{config.get('POST45_OCLC_SECRET', '') if not config.get('POST45_OCLC_KEYS_SET_VIA_ENV', false) else ''}}",
+              oclcClusterQualityScore: getQualityScoreNumber("{{config.get('POST45_OCLC_CLUSTER_QUALITY_SCORE', 'high')}}"),
+              oclcBookOnly: {{config.get('POST45_OCLC_BOOK_ONLY', false)|lower}},
+
+
+
+            }
+          },
+
+          methods:{
+            async buildHathiDatabase() {
+              this.isBuilding = true;
+              try {
+                const response = await fetch('/api/local/build_hathi_db', {
+                  method: 'POST'
+                });
+                const data = await response.json();
+                console.log('Build started:', data);
+                
+                // Start polling for status
+                this.startStatusPolling();
+              } catch (error) {
+                console.error('Error starting build:', error);
+                this.isBuilding = false;
+              }
+            },
+
+            async checkBuildStatus(initialCheck = false) {
+              try {
+                const response = await fetch('/api/local/hathi_build_status');
+                const data = await response.json();
+                this.buildStatus = data;
+                
+                // Update isBuilding based on status
+                if (data.status === 'complete' || data.status === 'error' || data.status === 'idle') {
+                  this.isBuilding = false;
+                  this.stopStatusPolling();
+                  
+                  // Check if database exists after completion
+                  if (data.status === 'complete') {
+                    const dbResponse = await fetch('/api/local/hathi_db_exists');
+                    const dbData = await dbResponse.json();
+                    this.hathiDbExists = dbData.exists;
+                  }
+                } else {
+                  this.isBuilding = true;
+                }
+                if (initialCheck) {
+                  // If this is the initial check, start polling
+                  this.startStatusPolling();
+                }
+              } catch (error) {
+                console.error('Error checking build status:', error);
+              }
+            },
+            
+            startStatusPolling() {
+              // Poll every 2 seconds
+              this.statusCheckInterval = setInterval(() => {
+                this.checkBuildStatus();
+              }, 2000);
+            },
+            
+            stopStatusPolling() {
+              if (this.statusCheckInterval) {
+                clearInterval(this.statusCheckInterval);
+                this.statusCheckInterval = null;
+              }
+            },
+            
+            formatTimestamp(timestamp) {
+              if (!timestamp) return '';
+              const date = new Date(timestamp);
+              return date.toLocaleString();
+            },
+            
+            async saveOclcConfig() {
+              try {
+                const response = await fetch('/api/local/set_config', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    POST45_OCLC_CLIENT_ID: this.oclcClientId,
+                    POST45_OCLC_SECRET: this.oclcSecret,
+                    POST45_OCLC_KEYS_SET_VIA_ENV: false
+                  })
+                });
+                
+                if (response.ok) {
+                  const result = await response.json();
+                  console.log('OCLC configuration updated successfully:', result);
+                  alert('OCLC configuration saved successfully!');
+                } else {
+                  console.error('Failed to update OCLC configuration:', response.status);
+                  alert('Failed to save OCLC configuration. Please try again.');
+                }
+              } catch (error) {
+                console.error('Error updating OCLC configuration:', error);
+                alert('An error occurred while saving OCLC configuration.');
+              }
+            },
+
+            async saveOclcSettings() {
+              try {
+                // Convert the numeric value to string representation
+                const qualityScoreMap = {
+                  1: 'very low',
+                  2: 'low',
+                  3: 'medium',
+                  4: 'high',
+                  5: 'very high'
+                };
+                
+                const response = await fetch('/api/local/set_config', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    POST45_OCLC_CLUSTER_QUALITY_SCORE: qualityScoreMap[this.oclcClusterQualityScore] || 'high',
+                    POST45_OCLC_BOOK_ONLY: this.oclcBookOnly
+                  })
+                });
+                
+                if (response.ok) {
+                  const result = await response.json();
+                  console.log('OCLC settings updated successfully:', result);
+                  // No alert on success - settings saved silently
+                } else {
+                  console.error('Failed to update OCLC settings:', response.status);
+                  alert('Failed to save OCLC settings. Please try again.');
+                }
+              } catch (error) {
+                console.error('Error updating OCLC settings:', error);
+                alert('An error occurred while saving OCLC settings.');
+              }
+            },
+
+            test(){
+
+            },
+            copyToClipboard(event,textToCopy) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // Optional: Show a success message or perform other actions
+                    event.target.style.backgroundColor = 'lightgreen';
+                    setTimeout(() => {
+                        event.target.style.backgroundColor = ''; // Reset to original or remove style
+                    }, 500); // Flash for 0.5 seconds
+
+
+                }).catch(err => {
+                    // Optional: Handle errors (e.g., clipboard access denied)
+                    alert('Failed to copy to clipboard.');
+                });
+            },
+
+
+
+
+
+
+          },
+
+          async created(){  
+            // Fetch HathiTrust database status on initialization
+            try {
+              const response = await fetch('/api/local/hathi_db_exists');
+              const data = await response.json();
+              this.hathiDbExists = data.exists;
+              console.log('HathiTrust DB exists:', this.hathiDbExists);
+              
+              // Also check build status
+              await this.checkBuildStatus(true);
+            } catch (error) {
+              console.error('Error fetching HathiTrust DB status:', error);
+              this.hathiDbExists = false;
+            }
+          },
+          
+          beforeDestroy() {
+            // Clean up interval when component is destroyed
+            this.stopStatusPolling();
+          }
+        }).mount('#app')
+
+
+    </script>
+
+
+
+
+</body>
+</html>

@@ -11,6 +11,11 @@ suggest_property = {
               "id": "contributor_uncontrolled_last_first"
             },
             {
+              "name": "Work Published Year (YYYY)",
+              "description": "The year the work was published",
+              "id": "work_published_year"
+            },            
+            {
               "name": "Contributor Controlled, 'Last, First XXXX-XXXX'",
               "description": "A LC NACO Authorized name headings in the format 'Smith, Jane 1895-1980' (doesn't always have life dates)",
               "id": "contributor_naco_controlled"

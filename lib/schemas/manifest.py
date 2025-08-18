@@ -27,12 +27,17 @@ manifest = {
       "name": "Title -- HathiTrust"
     },
     {
+      "id": "VIAF_Title",
+      "name": "Title -- VIAF Work"
+    },
+    {
+      "id": "Wikidata_Title",
+      "name": "Title -- Wikidata Work"
+    }, 
+    {
       "id": "VIAF_Personal",
       "name": "Name -- VIAF Personal"
-    }, 
-
-
-
+    }
   ],
   "identifierSpace": "/doc/#identifierSpace",
   "schemaSpace": "/doc/#schemaSpace",

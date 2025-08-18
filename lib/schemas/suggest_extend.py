@@ -3,6 +3,10 @@ extend_values_LC_Work_Id = {
   "type": "LC_Work_Id",
   "properties": [
     {
+      "id": "URI",
+      "name": "Work URI"
+    },
+    {
       "id": "ISBN",
       "name": "ISBN"
     },
@@ -13,6 +17,14 @@ extend_values_LC_Work_Id = {
     {
       "id": "OCLC",
       "name": "OCLC"
+    },
+    {
+      "id": "subjects",
+      "name": "Subject Headings"
+    },
+    {
+      "id": "genres",
+      "name": "Genres"
     }
   ]
 }
@@ -22,6 +34,7 @@ extend_values_Google_Books = {
   "limit": 10,
   "type": "Google_Books",
   "properties": [
+
     {
       "id": "ISBN",
       "name": "ISBN"
@@ -51,6 +64,16 @@ extend_values_VIAF = {
       "id": "wikidata",
       "name": "Wikidata"
     }
+
+  ]
+}
+
+extend_values_VIAF_Title = {
+  "limit": 10,
+  "type": "VIAF_Title",
+  "properties": [
+    
+    # none
 
   ]
 }
@@ -109,6 +132,9 @@ def suggest_extend(query):
         return extend_values_Google_Books
     if query == 'VIAF_Personal':
         return extend_values_VIAF
+    if query == 'VIAF_Title':
+        return extend_values_VIAF_Title
+    
     if query == 'OCLC_Record':
         return extend_values_Worldcat
     if query == 'HathiTrust':
