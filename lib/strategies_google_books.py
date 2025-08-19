@@ -488,10 +488,10 @@ def _cluster_works(records, reconcile_item, req_ip):
 	use_id = str(uuid.uuid4())
 	
 	# for unit tests, config might not be set
-	try:
-		config
-	except NameError:
-		config = {}
+	# try:
+	# 	config
+	# except NameError:
+	# 	config = {}
 		
 	## need this for unit tests
 	if 'APP_BASE' not in config:
