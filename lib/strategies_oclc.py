@@ -338,10 +338,10 @@ def _cluster_works(data, reconcile_item, req_ip):
 	# Store cluster data
 	use_id = str(uuid.uuid4())
 	# for unit tests, config might not be set
-	try:
-		config
-	except NameError:
-		config = {}
+	# try:
+	# 	config
+	# except NameError:
+	# 	config = {}
 
 
 	## need this for unit tests
