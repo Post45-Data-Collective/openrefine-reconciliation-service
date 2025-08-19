@@ -261,6 +261,13 @@ def reset_cluster_cache(req_ip, query):
 				with open(f'data/cache/cluster_cache_hathi_{req_ip}','w') as out:
 					out.write('')
 
+			if query[queryId]['type'] == 'OCLC_Record':
+				if os.path.isfile(f'data/cache/cluster_cache_oclc_{req_ip}'):
+					os.remove(f'data/cache/cluster_cache_oclc_{req_ip}')
+
+				with open(f'data/cache/cluster_cache_oclc_{req_ip}','w') as out:
+					out.write('')					
+
 
 def build_cluster_data(req_ip,service):
 	"""

@@ -400,7 +400,7 @@
     
                         <div class="box">
                             <p>Welcome! The service is running at:</p>
-                            <p><strong><code>http://127.0.0.1:5001/api/v1/reconcile</code></strong> <a href="#" @click.prevent="copyToClipboard($event,'http://127.0.0.1:5001/api/v1/reconcile')" style="font-size: 0.75em;" >copy</a></p>
+                            <p><strong><code>${appBase}$api/v1/reconcile</code></strong> <a href="#" @click.prevent="copyToClipboard($event,appBase + 'api/v1/reconcile')" style="font-size: 0.75em;" >copy</a></p>
                         </div>
     
 
@@ -1262,6 +1262,7 @@
 
               activeTab: 'home',
               matchMode: "{{config['POST45_RECONCILIATION_MODE']}}",
+              appBase: "{{config['APP_BASE']}}",
               dataExtendMode: "{{config['POST45_DATA_EXTEND_MODE']}}",
               removeSubtitle: {{config['POST45_REMOVE_SUBTITLE']|lower}},
               idClusterQualityScore: getQualityScoreNumber("{{config.get('POST45_ID_CLUSTER_QUALITY_SCORE', 'medium')}}"),
