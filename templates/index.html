@@ -1416,19 +1416,42 @@
             test(){
 
             },
-            copyToClipboard(event,textToCopy) {
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    // Optional: Show a success message or perform other actions
+            async copyToClipboard(event, textToCopy) {
+                try {
+                    // Check if clipboard API is available and secure context
+                    if (navigator.clipboard && window.isSecureContext) {
+                        await navigator.clipboard.writeText(textToCopy);
+                    } else {
+                        // Fallback method using temporary textarea
+                        const textArea = document.createElement('textarea');
+                        textArea.value = textToCopy;
+                        textArea.style.position = 'fixed';
+                        textArea.style.left = '-999999px';
+                        textArea.style.top = '-999999px';
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        
+                        try {
+                            document.execCommand('copy');
+                        } catch (err) {
+                            console.error('Fallback copy failed:', err);
+                            throw new Error('Copy failed');
+                        } finally {
+                            textArea.remove();
+                        }
+                    }
+                    
+                    // Visual feedback on success
                     event.target.style.backgroundColor = 'lightgreen';
                     setTimeout(() => {
-                        event.target.style.backgroundColor = ''; // Reset to original or remove style
-                    }, 500); // Flash for 0.5 seconds
-
-
-                }).catch(err => {
-                    // Optional: Handle errors (e.g., clipboard access denied)
-                    alert('Failed to copy to clipboard.');
-                });
+                        event.target.style.backgroundColor = '';
+                    }, 500);
+                    
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                    alert('Failed to copy to clipboard. Please copy manually.');
+                }
             },
 
 
