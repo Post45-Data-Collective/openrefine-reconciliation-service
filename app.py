@@ -68,6 +68,8 @@ app.config.update(
     POST45_OCLC_BOOK_ONLY=False, # Filter to only include books in OCLC results
     
 )
+if os.environ.get('OR_IP') is not None:
+  app.config['APP_BASE'] = os.environ.get('OR_IP')
 
 
 
