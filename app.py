@@ -277,7 +277,7 @@ def return_manifest():
 
                     if query[queryId]['type'] == 'VIAF_Personal':
                         # print('**',query,flush=True)
-                        return process_viaf_query(query)
+                        return process_viaf_query(query,current_app.config)
                         break
 
                     if query[queryId]['type'] == 'VIAF_Title':
@@ -309,7 +309,6 @@ def return_manifest():
 
 
             extend_req = json.loads(request.form['extend'])
-
             if 'ids' in extend_req:
                 if len(extend_req['ids'])>0:
                     if "id.loc.gov" in extend_req['ids'][0] or "cluster/id" in extend_req['ids'][0]:
