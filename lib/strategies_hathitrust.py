@@ -444,7 +444,7 @@ def _parse_results(data,reconcile_item):
 
 
 
-def extract_identifiers(record_dict):
+def extract_info(record_dict):
     """
     Extract hdl, LCCN, OCLC identifiers from a HathiTrust record dictionary.
     
@@ -473,7 +473,15 @@ def extract_identifiers(record_dict):
     # Extract OCLC
     if 'oclc_num' in record_dict and record_dict['oclc_num']:
         identifiers['OCLC'] = record_dict['oclc_num'].split(",")
-    
+
+    # Extract Rights Date Used
+    if 'rights_date_used' in record_dict and record_dict['rights_date_used']:
+		# just look for numbers in the value and return that
+        identifiers['rights_date_used'] = [int(s) for s in record_dict['rights_date_used'].split(",") if s.isdigit()]
+
+    if 'title' in record_dict and record_dict['title']:
+        identifiers['title'] = record_dict['title'].split(",")
+
 
 
     return identifiers
@@ -496,6 +504,12 @@ def extend_data(ids,properties,passed_config):
 			response['meta'].append({"id":"OCLC",'name':'OCLC'})
 		if p['id'] == 'thumbnail':
 			response['meta'].append({"id":"thumbnail",'name':'thumbnail'})
+		if p['id'] == 'pub_date_early':
+			response['meta'].append({"id":"pub_date_early",'name':'Earliest Publication Date'})
+		if p['id'] == 'pub_date_late':
+			response['meta'].append({"id":"pub_date_late",'name':'Latest Publication Date'})
+		if p['id'] == 'title':
+			response['meta'].append({"id":"title",'name':'Mode Title'})
 
 
 	for i in ids:
@@ -508,6 +522,9 @@ def extend_data(ids,properties,passed_config):
 			response['rows'][i]['LCCN'] = []
 			response['rows'][i]['OCLC'] = []
 			response['rows'][i]['thumbnail'] = []
+			response['rows'][i]['pub_date_early'] = []
+			response['rows'][i]['pub_date_late'] = []
+			response['rows'][i]['title'] = []
 
 			uuid_val = i.split('/')[-1]
 
@@ -517,7 +534,7 @@ def extend_data(ids,properties,passed_config):
 
 				for rec in data['cluster']:
 
-					rec_data = extract_identifiers(rec)
+					rec_data = extract_info(rec)
 
 
 					print("rec_data", rec_data, flush=True)
@@ -540,6 +557,42 @@ def extend_data(ids,properties,passed_config):
 								for value in rec_data['hdl']:
 									response['rows'][i]['thumbnail'].append({'str':f"https://babel.hathitrust.org/cgi/imgsrv/cover?id={value};width=250"})
 
+						if p['id'] == 'pub_date_early':
+							if 'rights_date_used' in rec_data:
+								# extract all dates from the cluster look for any numbers in the string and add them to list
+
+								for value in rec_data['rights_date_used']:
+									# look to see if it is the smallest date or the only date and add it if so
+									if not response['rows'][i]['pub_date_early'] or int(value) < int(response['rows'][i]['pub_date_early'][0]['str']):
+										response['rows'][i]['pub_date_early'] = [{'str': value}]
+
+						# do the same for pub_date_late
+						if p['id'] == 'pub_date_late':
+							if 'rights_date_used' in rec_data:
+								for value in rec_data['rights_date_used']:
+									if not response['rows'][i]['pub_date_late'] or int(value) > int(response['rows'][i]['pub_date_late'][0]['str']):
+										response['rows'][i]['pub_date_late'] = [{'str': value}]
+
+						if p['id'] == 'title':
+							if 'title' in rec_data:
+								for value in rec_data['title']:
+									response['rows'][i]['title'].append({'str':value})
+
+			# loop through all the response['rows'][i]['title'] and find the most common and replace the whole thing with that one value
+			if response['rows'][i]['title']:
+				title_counts = {}
+				for title in response['rows'][i]['title']:
+					title_str = title['str']
+					title_counts[title_str] = title_counts.get(title_str, 0) + 1
+				most_common_title = max(title_counts, key=title_counts.get)
+				response['rows'][i]['title'] = [{'str': most_common_title}]
+
+
+			# convert all the pub_date_late and pub_date_early to strings
+			for key in ['pub_date_early', 'pub_date_late']:
+				if response['rows'][i][key]:
+					response['rows'][i][key] = [{'str': str(item['str'])} for item in response['rows'][i][key]]
+
 		else:
 
 			response['rows'][i] = {}
@@ -553,7 +606,7 @@ def extend_data(ids,properties,passed_config):
 			if os.path.isfile(f'data/cache/hathi_{hathi_id}'):
 				data = json.load(open(f'data/cache/hathi_{hathi_id}'))
 
-				rec_data = extract_identifiers(data)
+				rec_data = extract_info(data)
 				for p in properties:
 
 					if p['id'] == 'hdl':

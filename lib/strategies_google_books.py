@@ -1,3 +1,4 @@
+import statistics
 import requests
 import os
 import json
@@ -494,9 +495,12 @@ def _cluster_works(records, reconcile_item, req_ip):
 	# 	config = {}
 		
 	## need this for unit tests
-	if 'APP_BASE' not in config:
-		config['APP_BASE'] = 'http://localhost:5001/'
-	
+	try:
+		if 'APP_BASE' not in config:
+			config['APP_BASE'] = 'http://localhost:5001/'
+	except:
+		config = {'APP_BASE': 'http://localhost:5001/'}
+		
 	use_uri = config['APP_BASE'] + 'cluster/google_books/' + use_id
 	all_clusters['orginal'] = {
 		'title': reconcile_item['title'],
@@ -550,6 +554,23 @@ def extend_data(ids, properties, passed_config):
 		if p['id'] == 'language':
 			response['meta'].append({"id":"language",'name':'Language'})
 
+		if p['id'] == 'language':
+			response['meta'].append({"id":"language",'name':'Language'})
+
+		if p['id'] == 'title':
+			response['meta'].append({"id":"title",'name':'Mode Title'})
+
+
+    # "cluster": [
+    #     {
+    #         "kind": "books#volume",
+    #         "id": "hKxm-sXHlOUC",
+    #         "etag": "AWmuWel5Q0g",
+    #         "selfLink": "https://www.googleapis.com/books/v1/volumes/hKxm-sXHlOUC",
+    #         "volumeInfo": {
+    #             "title": "Death of a Puppeteer",
+    #             "authors": [
+    #                 "William Gray Beyer"
 
 
 
@@ -658,8 +679,6 @@ def extend_data(ids, properties, passed_config):
 
 
 
-
-
 		elif 'cluster/google_books' in i:
 			# Cluster of volumes
 			uuid_val = i.split('/')[-1]
@@ -719,6 +738,43 @@ def extend_data(ids, properties, passed_config):
 									seen_langs.add(lang)
 									lang_values.append({"str": lang})
 						response['rows'][i]['language'] = lang_values if lang_values else [{}]
+
+					elif p['id'] == 'title':
+						all_titles = []
+
+						for item in data.get('cluster', []):
+							volume_info = item.get('volumeInfo', {})
+							if 'title' in volume_info and volume_info['title']:
+								all_titles.append(volume_info['title'])
+								
+						# get the mode avg of all_titles
+						mode_title = statistics.mode(all_titles) if all_titles else None
+
+						response['rows'][i]['title'] = [{"str": mode_title}] if mode_title else [{}]
+
+
+
+
+
+
+    # "cluster": [
+    #     {
+    #         "kind": "books#volume",
+    #         "id": "hKxm-sXHlOUC",
+    #         "etag": "AWmuWel5Q0g",
+    #         "selfLink": "https://www.googleapis.com/books/v1/volumes/hKxm-sXHlOUC",
+    #         "volumeInfo": {
+    #             "title": "Death of a Puppeteer",
+    #             "authors": [
+    #                 "William Gray Beyer"
+
+
+
+
+
+
+
+
 
 	print(i, flush=True)
 	print(properties, flush=True)

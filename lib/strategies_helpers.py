@@ -40,6 +40,7 @@ def _build_recon_dict(recon_query):
 
 def _build_recon_dict_name(recon_query):
 
+	print("recon_query====",recon_query,flush=True)
 	reconcile_item = {
 		'name': recon_query['query'],
 		'title': False,

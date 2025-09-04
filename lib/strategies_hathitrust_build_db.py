@@ -6,6 +6,9 @@ import requests
 import json
 from datetime import datetime
 import time
+import pickle
+import tempfile
+import shutil
 
 # all records: Processed 9400000 records. 18833795 lines read.
 # BK only: Processed 8710000 records. 12351232 lines read.
@@ -106,8 +109,14 @@ def build_db(gzipped_file_path):
     """
     This script is used to build a database of HathiTrust records from a gzipped file.
     It reads the gzipped file, extracts the records, and stores them in a database.
+    Records are batched to disk to avoid memory issues.
     """
     update_status("preparing", f"Building database from {gzipped_file_path}")
+    
+    # Create temp directory for batch files
+    temp_dir = tempfile.mkdtemp(prefix="hathi_batch_", dir="data/hathi")
+    print(f"Created temp directory for batches: {temp_dir}")
+    batch_files = []
 
 
 
@@ -165,6 +174,10 @@ def build_db(gzipped_file_path):
 
 
     records = []
+    batch_size = 50000
+    batch_count = 0
+    total_records = 0
+    
     print(f"Starting to read gzip file: {gzipped_file_path}")
     update_status("processing", f"Reading data from {gzipped_file_path}")
     try:
@@ -199,11 +212,22 @@ def build_db(gzipped_file_path):
                         
                         if current_record != None:
                             # print(current_record)
-                            if len(records) % 10000 == 0:
-                                print(f"Processed {len(records)} records. {line_count} lines read.")
-                                update_status("processing", f"Processed {len(records)} records from {line_count} lines", len(records))
-
                             records.append(current_record)
+                            total_records += 1
+                            
+                            if total_records % 10000 == 0:
+                                print(f"Processed {total_records} records. {line_count} lines read.")
+                                update_status("processing", f"Processed {total_records} records from {line_count} lines", total_records)
+                            
+                            # Write batch to disk when reaching batch_size
+                            if len(records) >= batch_size:
+                                batch_file = os.path.join(temp_dir, f"batch_{batch_count:04d}.pkl")
+                                with open(batch_file, 'wb') as bf:
+                                    pickle.dump(records, bf)
+                                batch_files.append(batch_file)
+                                print(f"Wrote batch {batch_count} with {len(records)} records to {batch_file}")
+                                batch_count += 1
+                                records = []  # Clear records list to free memory
 
                         previous_ht_bib_key = record['ht_bib_key']
                         current_record = {
@@ -256,74 +280,117 @@ def build_db(gzipped_file_path):
                     print(f"Error processing line: {line}")
                     print(f"CSV error: {e}")
  
+            # Don't forget the last record still in progress
+            if current_record is not None:
+                records.append(current_record)
+                total_records += 1
+                
+            # Write final batch if there are remaining records
+            if records:
+                batch_file = os.path.join(temp_dir, f"batch_{batch_count:04d}.pkl")
+                with open(batch_file, 'wb') as bf:
+                    pickle.dump(records, bf)
+                batch_files.append(batch_file)
+                print(f"Wrote final batch {batch_count} with {len(records)} records to {batch_file}")
+                records = []  # Clear records list
+                
     except FileNotFoundError:
         print(f"Error: File not found: {gzipped_file_path}")
         update_status("error", f"File not found: {gzipped_file_path}")
+        shutil.rmtree(temp_dir, ignore_errors=True)
+        return
     except gzip.BadGzipFile:
         print(f"Error: Invalid gzip file: {gzipped_file_path}")
         update_status("error", f"Invalid gzip file: {gzipped_file_path}")
+        shutil.rmtree(temp_dir, ignore_errors=True)
+        return
 
 
-    print(f"Starting to insert {len(records)} records into database")
-    update_status("processing", f"Inserting {len(records)} records into database", 0, len(records))
+    print(f"Starting to insert {total_records} records into database from {len(batch_files)} batch files")
+    update_status("processing", f"Inserting {total_records} records into database", 0, total_records)
     rec_count = 0
-    for record in records:
-        rec_count += 1
-        # Prepare data for SQLite insertion
-        # The current_record is guaranteed to be initialized and non-None at this point
-        # if at least one line has passed the initial filters.
-        data_tuple_for_db = (
-            int(record['ht_bib_key']),
-            "|".join(record['htid']),
-            record['access'],
-            record['description'],
-            "|".join(record['oclc_num']),
-            "|".join(record['isbn']),
-            "|".join(record['issn']),
-            "|".join(record['lccn']),
-            record['title'],
-            record['rights_date_used'],
-            "|".join(record['lang']),
-            record['author']
-        )
-
-        sql_insert_replace_stmt = """INSERT OR REPLACE INTO records 
-                                    (ht_bib_key, htid, access, description, oclc_num, isbn, issn, lccn, title, rights_date_used, lang, author)
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
-        try:
-            cursor.execute(sql_insert_replace_stmt, data_tuple_for_db)
-
-            # fts5_insert_stmt = """INSERT INTO author_title (rowid, author, title) VALUES (?, ?, ?)"""
-            # fts5_insert_stmt_tuple = (int(record['ht_bib_key']),record['author'], record['title'])
-            # print(fts5_insert_stmt_tuple)
-            # cursor.execute(fts5_insert_stmt, fts5_insert_stmt_tuple)
-
-
-            # Insert into FTS5 table
-            # The FTS5 table uses the rowid from the main 'records' table.
-            # We use ht_bib_key as the rowid.
-            fts5_insert_stmt = """INSERT INTO author_title (rowid, author, title) VALUES (?, ?, ?)"""
-            fts5_data_tuple = (
+    
+    # Process each batch file
+    for batch_idx, batch_file in enumerate(batch_files):
+        print(f"Processing batch {batch_idx + 1}/{len(batch_files)}: {batch_file}")
+        
+        # Load batch from disk
+        with open(batch_file, 'rb') as bf:
+            batch_records = pickle.load(bf)
+        
+        # Process records in this batch
+        for record in batch_records:
+            rec_count += 1
+            # Prepare data for SQLite insertion
+            # The current_record is guaranteed to be initialized and non-None at this point
+            # if at least one line has passed the initial filters.
+            data_tuple_for_db = (
                 int(record['ht_bib_key']),
-                record['author'],
-                record['title']
+                "|".join(record['htid']),
+                record['access'],
+                record['description'],
+                "|".join(record['oclc_num']),
+                "|".join(record['isbn']),
+                "|".join(record['issn']),
+                "|".join(record['lccn']),
+                record['title'],
+                record['rights_date_used'],
+                "|".join(record['lang']),
+                record['author']
             )
-            cursor.execute(fts5_insert_stmt, fts5_data_tuple)
+
+            sql_insert_replace_stmt = """INSERT OR REPLACE INTO records 
+                                        (ht_bib_key, htid, access, description, oclc_num, isbn, issn, lccn, title, rights_date_used, lang, author)
+                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+            try:
+                cursor.execute(sql_insert_replace_stmt, data_tuple_for_db)
+
+                # fts5_insert_stmt = """INSERT INTO author_title (rowid, author, title) VALUES (?, ?, ?)"""
+                # fts5_insert_stmt_tuple = (int(record['ht_bib_key']),record['author'], record['title'])
+                # print(fts5_insert_stmt_tuple)
+                # cursor.execute(fts5_insert_stmt, fts5_insert_stmt_tuple)
 
 
-            # Periodic commit based on rec_count (lines processed after initial filters)
-            # Adjust batch size (e.g., 10000) as needed for performance.
-            if rec_count % 10000 == 0:
-                conn.commit()
-                print(f"Database commit triggered at rec_count {rec_count}.") # Optional: for debugging
-                update_status("processing", f"Inserted {rec_count} records into database", rec_count)
-        except sqlite3.Error as e:
-            # Log error or handle as appropriate for the application
-            print(f"SQLite error during insert/replace for ht_bib_key {int(record['ht_bib_key'])}: {e}")
-            print(f"Record data: {data_tuple_for_db}")
+                # Insert into FTS5 table
+                # The FTS5 table uses the rowid from the main 'records' table.
+                # We use ht_bib_key as the rowid.
+                fts5_insert_stmt = """INSERT INTO author_title (rowid, author, title) VALUES (?, ?, ?)"""
+                fts5_data_tuple = (
+                    int(record['ht_bib_key']),
+                    record['author'],
+                    record['title']
+                )
+                cursor.execute(fts5_insert_stmt, fts5_data_tuple)
+
+
+                # Periodic commit based on rec_count (lines processed after initial filters)
+                # Adjust batch size (e.g., 10000) as needed for performance.
+                if rec_count % 10000 == 0:
+                    conn.commit()
+                    print(f"Database commit triggered at rec_count {rec_count}.") # Optional: for debugging
+                    update_status("processing", f"Inserted {rec_count} records into database", rec_count)
+            except sqlite3.Error as e:
+                # Log error or handle as appropriate for the application
+                print(f"SQLite error during insert/replace for ht_bib_key {int(record['ht_bib_key'])}: {e}")
+                print(f"Record data: {data_tuple_for_db}")
+        
+        # Delete batch file after processing to free disk space
+        try:
+            os.remove(batch_file)
+            print(f"Deleted processed batch file: {batch_file}")
+        except Exception as e:
+            print(f"Warning: Could not delete batch file {batch_file}: {e}")
+    
     conn.commit()  # Final commit after all records are processed
     print(f"Final database commit. Total records: {rec_count}")
     update_status("finalizing", f"Finalizing database with {rec_count} total records", rec_count)
+    
+    # Clean up temp directory
+    try:
+        shutil.rmtree(temp_dir)
+        print(f"Cleaned up temp directory: {temp_dir}")
+    except Exception as e:
+        print(f"Warning: Could not remove temp directory {temp_dir}: {e}")
     
     # Close connection and mark as complete
     if conn:

@@ -25,6 +25,10 @@ extend_values_LC_Work_Id = {
     {
       "id": "genres",
       "name": "Genres"
+    },
+    {
+        "id": "title",
+        "name": "Mode Title"
     }
   ]
 }
@@ -50,6 +54,10 @@ extend_values_Google_Books = {
     {
       "id": "language",
       "name": "Language"
+    },   
+    {
+      "id": "title",
+      "name": "Mode Title"
     },
 
   ]
@@ -87,9 +95,41 @@ extend_values_Worldcat = {
       "name": "ISBN Cluster"
     },
     {
+      "id": "title",
+      "name": "Mode Title"
+    },
+    {
       "id": "dewey",
       "name": "Dewey (DDC)"
-    }    
+    },
+    {
+      "id": "work",
+      "name": "Work ID"
+    },
+    {
+      "id": "lcc",
+      "name": "Library of Congress Classification"
+    },
+    {
+      "id": "OCLC",
+      "name": "OCLC"
+    },
+    {
+      "id": "subjects",
+      "name": "Subject Headings"
+    },
+    {
+      "id": "format",
+      "name": "Genres"
+    },
+    {
+      "id": "language",
+      "name": "Language"
+    },
+    {
+      "id": "LCCN",
+      "name": "LCCN"
+    }
 
   ]
 }
@@ -117,7 +157,19 @@ extend_values_HathiTrust = {
     {
       "id": "thumbnail",
       "name": "Thumbnail URL"
-    }
+    },
+    {
+      "id": "pub_date_early",
+      "name": "Earliest Publication Date"
+    },
+    {
+      "id": "pub_date_late",
+      "name": "Latest Publication Date"
+    },
+    {
+      "id": "title",
+      "name": "Mode Title"
+    },    
 
   ]
 }

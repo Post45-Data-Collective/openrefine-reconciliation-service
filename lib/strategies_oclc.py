@@ -345,9 +345,14 @@ def _cluster_works(data, reconcile_item, req_ip):
 
 
 	## need this for unit tests
-	if 'APP_BASE' not in config:
-		config['APP_BASE'] = 'http://localhost:5001/'
-	
+
+
+	try:
+		if 'APP_BASE' not in config:
+			config['APP_BASE'] = 'http://localhost:5001/'
+	except:
+		config = {'APP_BASE': 'http://localhost:5001/'}
+
 	use_uri = config['APP_BASE'] + 'cluster/oclc/' + use_id
 	
 	with open(f'data/cache/cluster_oclc_{use_id}','w') as out:
@@ -453,7 +458,7 @@ def extend_data(ids, properties, passed_config):
 	"""
 	Sent Ids and properties it talks to OCLC/WorldCat and returns the requested values
 	"""
-	
+	# print(ids, properties,flush=True)
 	response = {"meta":[],"rows":{}}
 	
 	for p in properties:
@@ -470,10 +475,26 @@ def extend_data(ids, properties, passed_config):
 		if p['id'] == 'format':
 			response['meta'].append({"id":"format",'name':'Format'})
 	
+		if p['id'] == 'isbn_cluster':
+			response['meta'].append({"id":"isbn_cluster",'name':'ISBN Cluster'})
+
+		if p['id'] == 'dewey':
+			response['meta'].append({"id":"dewey",'name':'Dewey Decimal Classification'})
+		if p['id'] == 'lcc':
+			response['meta'].append({"id":"lcc",'name':'Library of Congress Classification'})
+
+
+		if p['id'] == 'work':
+			response['meta'].append({"id":"work",'name':'Work ID'})
+		if p['id'] == 'title':
+			response['meta'].append({"id":"title",'name':'Mode Title'})
+
+
+
 	for i in ids:
 		response['rows'][i]={}
 		
-		if '/oclc/' in i:
+		if '/oclc/' in i and 'cluster/oclc' not in i:
 			# Single OCLC record
 			oclc_number = i.split('/')[-1]
 			cache_file = f'data/cache/oclc_{oclc_number}'
@@ -525,25 +546,70 @@ def extend_data(ids, properties, passed_config):
 							response['rows'][i]['format'] = [{}]
 		
 		elif 'cluster/oclc' in i:
+
 			# Cluster of OCLC records
 			uuid_val = i.split('/')[-1]
 			filename = f'data/cache/cluster_oclc_{uuid_val}'
+			print("filename",filename,flush=True)
 			if os.path.isfile(filename):
 				data = json.load(open(filename))
 				print(data, flush=True)
 				
 				# Extract data from cluster items (using standard cluster format)
 				for p in properties:
-					if p['id'] == 'ISBN':
+					if p['id'] == 'isbn_cluster':
 						isbn_values = []
 						seen_isbns = set()
 						for item in data.get('cluster', []):
-							for isbn in item.get('isbns', []):
-								if isbn not in seen_isbns:
-									seen_isbns.add(isbn)
-									isbn_values.append({"str": isbn})
-						response['rows'][i]['ISBN'] = isbn_values if isbn_values else [{}]
+							isbns = item.get('isbns', [])
+							if isbns != None:
+								for isbn in isbns:
+									if isbn not in seen_isbns:
+										if isbn != None:
+											seen_isbns.add(isbn)
+											isbn_values.append({"str": isbn})
+						response['rows'][i]['isbn_cluster'] = isbn_values if isbn_values else [{}]
 					
+
+					elif p['id'] == 'dewey':
+						dewey_values = []
+						seen_deweys = set()
+						for item in data.get('cluster', []):
+							classifications = item.get('classifications', None)
+							if classifications != None:
+									
+								dewey = item.get('classifications', {}).get('dewey')
+								if dewey and dewey not in seen_deweys:
+									seen_deweys.add(dewey)
+									dewey_values.append({"str": dewey})
+						response['rows'][i]['dewey'] = dewey_values if dewey_values else [{}]
+
+					elif p['id'] == 'lcc':
+						lcc_values = []
+						seen_lccs = set()
+						for item in data.get('cluster', []):
+							classifications = item.get('classifications', None)
+							if classifications != None:
+								lcc = item.get('classifications', {}).get('lc')
+								if lcc and lcc not in seen_lccs:
+									seen_lccs.add(lcc)
+									lcc_values.append({"str": lcc})
+						response['rows'][i]['lcc'] = lcc_values if lcc_values else [{}]
+
+					elif p['id'] == 'work':
+						work_values = []
+						seen_works = set()
+						for item in data.get('cluster', []):
+							work = item.get('workId')
+							if work and work not in seen_works:
+								seen_works.add(work)
+								work_values.append({"str": work})
+						response['rows'][i]['work'] = work_values if work_values else [{}]
+
+
+
+
+
 					elif p['id'] == 'LCCN':
 						lccn_values = []
 						seen_lccns = set()
@@ -568,10 +634,12 @@ def extend_data(ids, properties, passed_config):
 						subject_values = []
 						seen_subjects = set()
 						for item in data.get('cluster', []):
-							for subj in item.get('subjects', []):
-								if subj not in seen_subjects:
-									seen_subjects.add(subj)
-									subject_values.append({"str": subj})
+							subj_list = item.get('subjects', [])
+							if subj_list != None:
+								for subj in subj_list:
+									if subj not in seen_subjects:
+										seen_subjects.add(subj)
+										subject_values.append({"str": subj})
 						response['rows'][i]['subjects'] = subject_values if subject_values else [{}]
 					
 					elif p['id'] == 'language':
@@ -594,6 +662,28 @@ def extend_data(ids, properties, passed_config):
 								format_values.append({"str": fmt})
 						response['rows'][i]['format'] = format_values if format_values else [{}]
 	
+					elif p['id'] == 'title':
+						titles = []
+						for item in data.get('cluster', []):
+							title = item.get('mainTitle',None)
+							if title:
+								titles.append(title)
+						
+						# make title the mode of all the strings in titles
+						if titles:
+							mode_title = max(set(titles), key=titles.count)
+							response['rows'][i]['title'] = [{"str": mode_title}]
+						else:
+							response['rows'][i]['title'] = [{}]
+
+
+
+
+
+
+
+
+
 	print(i, flush=True)
 	print(properties, flush=True)
 	print(response, flush=True)

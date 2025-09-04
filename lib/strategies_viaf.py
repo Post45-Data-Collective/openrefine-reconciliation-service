@@ -28,10 +28,18 @@ VIAF_HEADERS = {
 
 
 
-def process_viaf_query(query):
+def process_viaf_query(query,passed_config):
 	"""This is what is called from the query endpoint, it will figure out how to process the work query
 	"""
 	
+	global config
+	config = passed_config
+
+	req_ip = query['req_ip']
+	del query['req_ip']  # Remove req_ip from the query dictionary to avoid passing it to _build_recon_dict
+	
+
+
 	query_reponse = {}
 	# we need to figure out what type strategy we are going to use based on what they have sent with the reqest
 	# with viaf personal just do the same search if they provided a title or not
@@ -45,9 +53,9 @@ def process_viaf_query(query):
 
 
 		result =  _search_name(reconcile_item)
-		print("\n\n\nresult",result,flush=True)
+
 		result = _parse_name_results(result,reconcile_item)
-		print("\n\n\nresult",result,flush=True)
+
 
 		query_reponse[queryId] = {
 			'result' : result['or_query_response']
@@ -292,7 +300,7 @@ def _parse_name_results(result,reconcile_item):
 
 
 
-def extend_data(ids,properties):
+def extend_data(ids,properties, passed_config):
 	"""
 		Sent Ids and proeprties it talks to viaf and returns the reuqested values
 	"""
@@ -316,12 +324,12 @@ def extend_data(ids,properties):
 		for p in properties:
 
 			if p['id'] == 'wikidata':
-
+				print("Checking cache for",i,flush=True)
 				# load it from the cache
 				passed_id_escaped = i.replace(":",'_').replace("/",'_')
 				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
 					data = json.load(open(f'data/cache/{passed_id_escaped}'))
-
+					print("data",data,flush=True)
 					allQids = re.findall(r"WKP\|Q[0-9]{2,}", json.dumps(data))
 
 					if len(allQids) > 0:
@@ -469,7 +477,7 @@ def _parse_viaf_headings(data: Dict[str, Any]) -> List[Dict[str, Any]]:
         records.
     """
     results = []
-
+    print("data from viaf", data, flush=True)
     # Safely navigate to the list of records using .get() to avoid KeyErrors.
     records = data.get('queryResult', {}).get('records', {}).get('record', [])
 

@@ -1,3 +1,4 @@
+import statistics
 import requests
 import json
 import xml.etree.ElementTree as ET
@@ -682,7 +683,8 @@ def extend_data(ids,properties,passed_config):
 			response['meta'].append({"id":"URI",'name':'Work URI'})
 		if p['id'] == 'genres':
 			response['meta'].append({"id":"genres",'name':'Genres'})
-
+		if p['id'] == 'title':
+			response['meta'].append({"id":"title",'name':'Mode Title'})
 
 	for i in ids:
 
@@ -811,6 +813,21 @@ def extend_data(ids,properties,passed_config):
 								uri_values.append({"str": item['uri']})
 						response['rows'][i]['URI'] = uri_values if uri_values else [{}]
 					
+					elif p['id'] == 'title':
+						all_titles = []
+
+						for item in data.get('cluster', []):
+							if 'aLabel' in item and item['aLabel']:
+								all_titles.append(item['aLabel'])
+
+						# get the mode avg of all_titles
+						mode_title = statistics.mode(all_titles) if all_titles else None
+
+						response['rows'][i]['title'] = [{"str": mode_title}] if mode_title else [{}]
+
+
+
+
 					elif p['id'] == 'genres':
 						genres_values = []
 						seen_genres = set()
