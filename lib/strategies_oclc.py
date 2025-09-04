@@ -318,6 +318,7 @@ def _cluster_works(data, reconcile_item, req_ip):
 	"""
 	Cluster OCLC/WorldCat results by workId - but flatten to match standard format
 	"""
+	global config
 	
 	if 'results' in data:
 		records = data['results']
@@ -352,6 +353,10 @@ def _cluster_works(data, reconcile_item, req_ip):
 			config['APP_BASE'] = 'http://localhost:5001/'
 	except:
 		config = {'APP_BASE': 'http://localhost:5001/'}
+
+	# if config['APP_BASE'] doesn't end in a '/' add it
+	if not config['APP_BASE'].endswith('/'):
+		config['APP_BASE'] += '/'
 
 	use_uri = config['APP_BASE'] + 'cluster/oclc/' + use_id
 	

@@ -545,7 +545,7 @@ def _parse_single_results(data, reconcile_item):
 
 def _cluster_works(records,reconcile_item,req_ip):
 
-
+	global config
 
 
 	if 'hits' in records:
@@ -567,6 +567,10 @@ def _cluster_works(records,reconcile_item,req_ip):
 	if 'APP_BASE' not in config:
 		config['APP_BASE'] = 'http://localhost:5001/'
 
+
+	# if config['APP_BASE'] doesn't end in a '/' add it
+	if not config['APP_BASE'].endswith('/'):
+		config['APP_BASE'] += '/'
 
 	use_uri = config['APP_BASE'] + 'cluster/id/' + use_id
 	all_clusters['orginal'] = {

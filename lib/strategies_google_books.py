@@ -474,7 +474,8 @@ def _cluster_works(records, reconcile_item, req_ip):
 	"""
 	Cluster Google Books results
 	"""
-	
+	global config
+
 	if 'items' in records:
 		records = records['items']
 	
@@ -500,7 +501,11 @@ def _cluster_works(records, reconcile_item, req_ip):
 			config['APP_BASE'] = 'http://localhost:5001/'
 	except:
 		config = {'APP_BASE': 'http://localhost:5001/'}
-		
+	
+	# if config['APP_BASE'] doesn't end in a '/' add it
+	if not config['APP_BASE'].endswith('/'):
+		config['APP_BASE'] += '/'
+
 	use_uri = config['APP_BASE'] + 'cluster/google_books/' + use_id
 	all_clusters['orginal'] = {
 		'title': reconcile_item['title'],
