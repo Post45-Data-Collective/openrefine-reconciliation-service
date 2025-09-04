@@ -42,7 +42,7 @@ manifest = {
   "identifierSpace": "/doc/#identifierSpace",
   "schemaSpace": "/doc/#schemaSpace",
 
-  "name": "Post 45 Reconciliation Service",
+  "name": "BookReconciler Service",
   "batchSize": 1,
   "preview": {
     "height": 200,
