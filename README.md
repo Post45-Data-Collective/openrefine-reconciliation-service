@@ -1,9 +1,190 @@
 ![build passes](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/actions/workflows/python-app.yml/badge.svg)
 
 # openrefine-reconciliation-service
+
 Openrefine 0.2 reconciliation service
 
 Extremely temporary test endpoint: `http://164.92.77.151/api/v1/reconcile`
 
+# BookReconciler — an OpenRefine Extension for Metadata Enrichment and Work-Level Clustering
 
+**BookReconciler** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources. It works seamlessly with **[OpenRefine](https://openrefine.org/)** and includes a simple browser page for configuration.
 
+- **Who is this for?** Digital humanities researchers, librarians, metadata specialists.
+- **What does it do?** Finds, clusters, and enriches records (IDs, titles, creators, dates, etc.) for books across editions and services.
+
+---
+
+## Supported Services
+
+BookReconciler can reconcile data against **six major bibliographic services**:
+
+1. **id.loc.gov** (Library of Congress)
+2. **Google Books**
+3. **OCLC / WorldCat**
+4. **HathiTrust**
+5. **VIAF** (Personal names and Works/Titles)
+6. **Wikidata** (Works/Titles)
+
+In OpenRefine you’ll see these as reconciliation types:  
+`LC_Work_Id`, `Google_Books`, `OCLC_Record`, `HathiTrust`, `VIAF_Personal`, `VIAF_Title`, `Wikidata_Title`.
+
+---
+
+## Requirements
+
+- Python 3.10+
+- macOS / Linux / Windows
+- [OpenRefine](https://openrefine.org/) (see below)
+- (Optional) OCLC API credentials if you plan to query WorldCat protected endpoints
+
+## Installing OpenRefine
+
+BookReconciler is designed to work with **OpenRefine**, an open-source tool for working with messy data.
+
+1. Visit the [OpenRefine download page](https://openrefine.org/download).
+2. Download the latest release for your operating system (Windows, macOS, or Linux).
+3. Unzip the package (if needed) and follow the included instructions to start OpenRefine.
+   - On macOS/Windows you can usually just double-click the launcher.
+   - On Linux, run `./refine` from the extracted folder.
+4. Once running, OpenRefine will be available at:  
+   <http://127.0.0.1:3333/>
+
+---
+
+## BookReconciler Quick Start
+
+### 1) Clone this GitHub repository
+
+```bash
+git clone https://github.com/<your-org-or-user>/openrefine-reconciliation-service.git
+cd openrefine-reconciliation-service
+```
+
+### 2) Create a virtual environment (recommended but not required)
+
+**macOS / Linux**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+**Windows (PowerShell)**
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+### 3) Install required packages
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### 4) Start the server, which runs the BookReconciler tool
+
+```bash
+# Tell Flask which app to run
+export FLASK_APP=app.py          # Windows PowerShell: $env:FLASK_APP="app.py"
+
+# Start BookReconciler on port 5001
+flask run --host=0.0.0.0 --port=5001
+# (Optional during development) add --debug to auto-reload on file changes:
+# flask run --host=0.0.0.0 --port=5001 --debug
+```
+
+When it starts, the service will be available at:
+
+- **Browser User Interface (for configuration):** <http://localhost:5001/>
+- **OpenRefine endpoint:** <http://localhost:5001/api/v1/reconcile>
+
+---
+
+## Use with OpenRefine
+
+1. Open your project in OpenRefine.
+2. Click a column you want to reconcile.
+3. Choose **Reconcile → Start reconciling…**
+4. Click **Add Standard Service**.
+5. Paste the service URL:
+
+   ```
+   http://localhost:5001/api/v1/reconcile
+   ```
+
+6. Select a reconciliation type (e.g., `LC_Work_Id`, `OCLC_Record`, `HathiTrust`, `VIAF_Personal`, `VIAF_Title`, `Wikidata_Title`).
+7. Click **Start Reconciling**.
+
+---
+
+## Configure Behavior in the Browser
+
+Open <http://localhost:5001/> to adjust how BookReconciler matches, clusters, and writes back data. No code editing required.
+
+### 🔎 Title Matching Behavior
+
+- **Single Match Mode**  
+  Finds the _best single edition_ (manifestation) of a work.  
+  Good when you care about a specific edition (e.g., a 1950 reprint).  
+  Uses Title + Author (and Publication Year if available).
+
+- **Cluster Match Mode**  
+  Groups _all editions_ of the same **work** into a cluster (work-level).  
+  Best for gathering as many identifiers as possible or studying works across editions.
+
+### 🗂️ Extend Data Behavior (how identifiers are written back)
+
+- **Join Mode** — all identifiers in one cell, separated by a pipe `|`.  
+  Example:
+
+  ```
+  123456789 | 987654321 | 192837465 | 564738291
+  ```
+
+- **Row Mode** — each identifier in its own row.  
+  Example:
+  ```
+  123456789
+  987654321
+  192837465
+  564738291
+  ```
+
+### ✂️ Remove Subtitle from Titles
+
+- **Keep Subtitles** — Titles remain as-is (e.g., _Moby-Dick: or, The Whale_).
+- **Remove Subtitles** — Attempts to strip subtitles (e.g., _Moby-Dick_).
+
+---
+
+## Optional: OCLC / WorldCat API Keys
+
+If you plan to use OCLC’s protected endpoints, you can input your API keys on the configuration page.
+
+---
+
+## Why This Matters
+
+BookReconciler helps connect **library metadata** to **research data**:
+
+- Link datasets to authoritative identifiers (ISBN, OCLC, VIAF, LCCN, Wikidata).
+- Enrich corpora for literary, historical, or cultural analysis.
+- Normalize titles to improve match quality.
+- Analyze _works_ across multiple editions.
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome! If you have questions specific to DH workflows (work-level analysis, edition clustering, identifier coverage), please open an issue with a small sample of your data.
+
+---
+
+## License
+
+This project is licensed under the **MIT License**. See the [`LICENSE`](LICENSE) file for details.
+
+---
