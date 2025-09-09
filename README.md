@@ -1,8 +1,8 @@
 ![build passes](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/actions/workflows/python-app.yml/badge.svg)
 
-# BookReconciler (0.2) — an OpenRefine Extension for Metadata Enrichment and Work-Level Clustering
+# BookReconciler 📘💎 (0.2) — Metadata Enrichment and Work-Level Clustering
 
-**BookReconciler** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources. You can take a spreadsheet with only title and author information, and you can add identifiers like **ISBNs**, **OCLC numbers**, or **HathiTrust Volume IDs**, as well as valuable contextual information like Library of Congress **Subject Headings**, **genres**, **descriptions**, **page counts**, and **dates of first publicatio**n. Additionally, you can find and cluster different editions or manifestations of the same _Work_ (e.g., translations, reprints, etc.).
+**BookReconciler 📘💎** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources. You can take a spreadsheet with only title and author information, and you can add identifiers like **ISBNs**, **OCLC numbers**, or **HathiTrust Volume IDs**, as well as valuable contextual information like Library of Congress **Subject Headings**, **genres**, **descriptions**, **page counts**, and **dates of first publicatio**n. Additionally, you can find and cluster different editions or manifestations of the same _Work_ (e.g., translations, reprints, etc.).
 
 The tool currently works as an extension of the software application **[OpenRefine](https://openrefine.org/)**, which makes it accessible to those with and without computational experience. It includes a user-friendly, human-in-the-loop interface for manually evaluating matches, defining _Works_ (e.g., whether to include translations or not), and configuring the behavior of the service (e.g., matching all possible editions or just the best one).
 
@@ -17,7 +17,7 @@ Lastly, it can also help users verify that their data is correct and clean — 
 
 ## Supported Services
 
-BookReconciler can reconcile data against **six major bibliographic services**:
+BookReconciler 📘💎 can reconcile data against **six major bibliographic services**:
 
 1. **id.loc.gov** (Library of Congress)
 2. **Google Books**
@@ -41,7 +41,7 @@ In OpenRefine you’ll see these as reconciliation types:
 
 ## Installing OpenRefine
 
-BookReconciler is designed to work with **OpenRefine**, an open-source tool for working with messy data.
+BookReconciler 📘💎 is designed to work with **OpenRefine**, an open-source tool for working with messy data.
 
 1. Visit the [OpenRefine download page](https://openrefine.org/download).
 2. Download the latest release for your operating system (Windows, macOS, or Linux).
@@ -55,21 +55,30 @@ BookReconciler is designed to work with **OpenRefine**, an open-source tool for 
 
 ## BookReconciler Quick Start
 
-Using Docker is the quickest way to get started with BookReconciler if you have Docker and Docker Compose installed.
+The quickest way to get started with BookReconciler 📘💎 is to use Docker. If you don't have it installed already, install [Docker Desktop](https://www.docker.com/products/docker-desktop/), and then open Docker Desktop and make sure it's running.
 
-## With Docker
+## Download the App
 
-### 1) Clone this GitHub repository and start service
+Then download and unzip the BookReconciler App:
+
+- [BookReconciler App (Mac)](BookReconcilerApp.zip)
+- [BookReconciler App (Windows)](BookReconcilerApp.bat.zip)
+
+Double-click the app to launch it. When it’s ready, you can open your browser to <http://localhost:5001/> to access the configuration interface, or use the OpenRefine endpoint at <http://localhost:5001/api/v1/reconcile>.
+
+## Run From the Command Line with Docker
+
+You can also run Docker from the command line directly, which is a bit more flexible and works on any OS, as long as you have Docker installed.
 
 ```bash
-git clone https://github.com/<your-org-or-user>/openrefine-reconciliation-service.git
+git clone https://github.com/Post45-Data-Collective/openrefine-reconciliation-service.git
 cd openrefine-reconciliation-service
 docker compose up
 ```
 
 ---
 
-## Without Docker
+## Launch Your Own Server
 
 If you'd rather not use Docker, you can follow these steps:
 
