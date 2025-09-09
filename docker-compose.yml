@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: book-reconciler
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./:/app
+    environment:
+      - OCLC_CLIENT_ID=your_oclc_client_id
+      - OCLC_CLIENT_SECRET=your_oclc_client_secret
+      - OR_IP=http://127.0.0.1:5001
+    restart: unless-stopped
+
+

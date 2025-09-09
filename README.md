@@ -4,8 +4,6 @@
 
 Openrefine 0.2 reconciliation service
 
-Extremely temporary test endpoint: `http://164.92.77.151/api/v1/reconcile`
-
 # BookReconciler — an OpenRefine Extension for Metadata Enrichment and Work-Level Clustering
 
 **BookReconciler** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources. It works seamlessly with **[OpenRefine](https://openrefine.org/)** and includes a simple browser page for configuration.
@@ -53,6 +51,19 @@ BookReconciler is designed to work with **OpenRefine**, an open-source tool for 
 ---
 
 ## BookReconciler Quick Start
+
+Using Docker is the quickest way to get started with BookReconciler if you have Docker and Docker Compose installed.
+
+### 1) Clone this GitHub repository and start service
+
+```bash
+git clone https://github.com/<your-org-or-user>/openrefine-reconciliation-service.git
+cd openrefine-reconciliation-service
+docker compose up
+```
+---
+
+If you rather not use Docker you can follow these steps:
 
 ### 1) Clone this GitHub repository
 

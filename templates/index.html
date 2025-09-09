@@ -670,7 +670,10 @@
                             <div class="column">
                                 <div class="box">
                                     <h3 class="title is-5">Database Status</h3>
-                                    <div v-if="buildStatus.status != 'complete'" class="notification is-warning"> 
+                                    <div v-if="buildStatus.status == 'idle' && hathiDbExists == false" class="notification is-warning"> 
+                                        HathiTrust database does not exist. You need to build it first.
+                                    </div>
+                                    <div v-else-if="buildStatus.status != 'complete'" class="notification is-warning"> 
                                         HathiTrust database is being built or updated.
                                     </div>
                                     <div v-else-if="hathiDbExists" class="notification is-success">
@@ -1257,7 +1260,7 @@
 
               activeTab: 'home',
               matchMode: "{{config['POST45_RECONCILIATION_MODE']}}",
-              appBase: "{{config['APP_BASE']}}",
+              appBase: "{{ config['APP_BASE'] if config['APP_BASE'].endswith('/') else config['APP_BASE'] + '/' }}",
               dataExtendMode: "{{config['POST45_DATA_EXTEND_MODE']}}",
               removeSubtitle: {{config['POST45_REMOVE_SUBTITLE']|lower}},
               idClusterQualityScore: getQualityScoreNumber("{{config.get('POST45_ID_CLUSTER_QUALITY_SCORE', 'medium')}}"),
@@ -1269,7 +1272,7 @@
               oclcKeysSetViaEnv: {{config.get('POST45_OCLC_KEYS_SET_VIA_ENV', false)|lower}},
               oclcClientId: "{{config.get('POST45_OCLC_CLIENT_ID', '') if not config.get('POST45_OCLC_KEYS_SET_VIA_ENV', false) else ''}}",
               oclcSecret: "{{config.get('POST45_OCLC_SECRET', '') if not config.get('POST45_OCLC_KEYS_SET_VIA_ENV', false) else ''}}",
-              oclcClusterQualityScore: getQualityScoreNumber("{{config.get('POST45_OCLC_CLUSTER_QUALITY_SCORE', 'high')}}"),
+              oclcClusterQualityScore: getQualityScoreNumber("{{config.get('      45_OCLC_CLUSTER_QUALITY_SCORE', 'high')}}"),
               oclcBookOnly: {{config.get('POST45_OCLC_BOOK_ONLY', false)|lower}},
 
 

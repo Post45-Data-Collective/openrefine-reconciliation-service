@@ -2,4 +2,3 @@ Flask==3.1.0
 requests==2.31.0
 flask-cors==5.0.0
 thefuzz==0.22.1
-beautifulsoup4==4.13.3
