@@ -2,22 +2,7 @@
 
 # BookReconciler 📘💎 (0.2) — Metadata Enrichment and Work-Level Clustering
 
-**BookReconciler 📘💎** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources. You can take a spreadsheet with only title and author information, and you can add identifiers like **ISBNs**, **OCLC numbers**, or **HathiTrust Volume IDs**, as well as valuable contextual information like Library of Congress **Subject Headings**, **genres**, **descriptions**, **page counts**, and **dates of first publicatio**n. Additionally, you can find and cluster different editions or manifestations of the same _Work_ (e.g., translations, reprints, etc.).
-
-The tool currently works as an extension of the software application **[OpenRefine](https://openrefine.org/)**, which makes it accessible to those with and without computational experience. It includes a user-friendly, human-in-the-loop interface for manually evaluating matches, defining _Works_ (e.g., whether to include translations or not), and configuring the behavior of the service (e.g., matching all possible editions or just the best one).
-
-This tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis.
-
-Lastly, it can also help users verify that their data is correct and clean — if a title and author doesn't reconcile, it might mean that there's a typo or mistake in the data.
-
-- **Who is this for?** Digital humanities researchers, librarians, metadata specialists, and more!
-- **What does it do?** Finds, clusters, and enriches records for books. Adding ISBNS, HathiTrust IDs, subject headings, descriptions, page counts, publication dates, and more.
-
----
-
-## Supported Services
-
-BookReconciler 📘💎 can reconcile data against **six major bibliographic services**:
+**BookReconciler 📘💎** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources:
 
 1. **id.loc.gov** (Library of Congress)
 2. **Google Books**
@@ -26,18 +11,14 @@ BookReconciler 📘💎 can reconcile data against **six major bibliographic ser
 5. **VIAF** (Personal names and Works/Titles)
 6. **Wikidata** (Works/Titles)
 
-In OpenRefine you’ll see these as reconciliation types:  
-`LC_Work_Id`, `Google_Books`, `OCLC_Record`, `HathiTrust`, `VIAF_Personal`, `VIAF_Title`, `Wikidata_Title`.
+You can take a spreadsheet with only title and author information, and you can add identifiers like **ISBNs**, **OCLC numbers**, or **HathiTrust Volume IDs**, as well as valuable contextual information like Library of Congress **Subject Headings**, **genres**, **descriptions**, **page counts**, and **dates of first publicatio**n. Additionally, you can find and cluster different editions or manifestations of the same _Work_ (e.g., translations, reprints, etc.).
 
----
+The tool currently works as an extension of the software application **[OpenRefine](https://openrefine.org/)**, which makes it accessible to those with and without computational experience. It includes a user-friendly, human-in-the-loop interface for manually evaluating matches, defining _Works_ (e.g., whether to include translations or not), and configuring the behavior of the service (e.g., matching all possible editions or just the best one).
 
-## Requirements
+The tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis.
 
-- Python 3.10+
-- macOS / Linux / Windows
-- [OpenRefine](https://openrefine.org/) (see below)
-- (Optional) Docker
-- (Optional) OCLC API credentials if you plan to query WorldCat protected endpoints
+- **Who is this for?** Digital humanities researchers, librarians, metadata specialists, and more!
+- **What does it do?** Finds, clusters, and enriches records for books. Adding ISBNS, HathiTrust IDs, subject headings, descriptions, page counts, publication dates, and more.
 
 ## Installing OpenRefine
 
@@ -61,8 +42,8 @@ The quickest way to get started with BookReconciler 📘💎 is to use Docker. I
 
 Then download and unzip the BookReconciler App:
 
-- [BookReconciler App (Mac)](BookReconcilerApp.zip)
-- [BookReconciler App (Windows)](BookReconcilerApp.bat.zip)
+- <a href="BookReconcilerApp.zip" download>BookReconciler App (Mac)</a>
+- <a href="BookReconcilerApp.bat.zip" download>BookReconciler App (Windows)</a>
 
 Double-click the app to launch it. When it’s ready, you can open your browser to <http://localhost:5001/> to access the configuration interface, or use the OpenRefine endpoint at <http://localhost:5001/api/v1/reconcile>.
 
@@ -80,7 +61,14 @@ docker compose up
 
 ## Launch Your Own Server
 
-If you'd rather not use Docker, you can follow these steps:
+If you'd rather not use Docker, you can follow these steps.
+
+## Requirements
+
+- Python 3.10+
+- macOS / Linux / Windows
+- [OpenRefine](https://openrefine.org/) (see below)
+- (Optional) OCLC API credentials if you plan to query WorldCat protected endpoints
 
 ### 1) Clone this GitHub repository
 
