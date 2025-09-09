@@ -40,9 +40,11 @@ The quickest way to get started with BookReconciler 📘💎 is to use Docker. I
 
 ## Download the App
 
-Then download and unzip the BookReconciler App:
+Then download and unzip the BookReconciler App.
 
 - <a href="BookReconcilerApp.zip" download="BookReconcilerApp.zip">BookReconciler App (Mac)</a>
+  Note: Right-click the app and select → Open → Open.
+  <br>
 - <a href="BookReconcilerApp.bat.zip" download="BookReconcilerApp.bat.zip">BookReconciler App (Windows)</a>
 
 Double-click the app to launch it. When it’s ready, you can open your browser to <http://localhost:5001/> to access the configuration interface, or use the OpenRefine endpoint at <http://localhost:5001/api/v1/reconcile>.
