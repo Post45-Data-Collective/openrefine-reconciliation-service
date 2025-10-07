@@ -28,7 +28,7 @@ extend_values_LC_Work_Id = {
     },
     {
         "id": "title",
-        "name": "Mode Title"
+        "name": "Most Common Title"
     }
   ]
 }
@@ -57,7 +57,7 @@ extend_values_Google_Books = {
     },   
     {
       "id": "title",
-      "name": "Mode Title"
+      "name": "Most Common Title"
     },
 
   ]
@@ -96,7 +96,7 @@ extend_values_Worldcat = {
     },
     {
       "id": "title",
-      "name": "Mode Title"
+      "name": "Most Common Title"
     },
     {
       "id": "dewey",
@@ -168,7 +168,7 @@ extend_values_HathiTrust = {
     },
     {
       "id": "title",
-      "name": "Mode Title"
+      "name": "Most Common Title"
     },    
 
   ]

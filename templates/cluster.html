@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FlaskApp</title>
+    <title>BookReconciler Cluster</title>
 
     <script src="/static/vue.global.js"></script>
     <link rel="stylesheet" href="/static/bulma.min.css" />
@@ -304,6 +304,12 @@
                     return 'WorldCat';
                 } else if ((item.uri && item.uri.includes('googleapis.com')) || item.id) {
                     return 'Google Books';
+                } else if ((item.uri && item.uri.includes('books.google')) || item.id) {
+                    return 'Google Books';
+
+
+
+
                 } else {
                     return 'Unknown Source';
                 }
@@ -379,7 +385,7 @@
             getItemLink(item) {
                 // Generate appropriate link for the item
                 if (item.htid) {
-                    return `https://catalog.hathitrust.org/Record/${item.htid}`;
+                    return `https://catalog.hathitrust.org/Record/${item.ht_bib_key}`;
                 } else if (item.oclcNumber) {
                     // OCLC/WorldCat - construct URL from OCLC number
                     return `https://worldcat.org/oclc/${item.oclcNumber}`;
@@ -387,10 +393,13 @@
                     return item.uri;
                 } else if (item.selfLink) {
                     // Google Books direct link
-                    return item.selfLink;
+                    // return item.selfLink;
+                     return `https://books.google.com/books?id=${item.id}`;
+
                 } else if (item.id) {
                     // Google Books - construct URL from ID
-                    return `https://www.googleapis.com/books/v1/volumes/${item.id}`;
+                    // return `https://www.googleapis.com/books/v1/volumes/${item.id}`;
+                    return `https://books.google.com/books?id=${item.id}`;
                 } else if (item.url) {
                     return item.url;
                 } else {
@@ -412,6 +421,9 @@
                     return 'WorldCat';
                 } else if (item.uri && item.uri.includes('googleapis.com')) {
                     return 'Google Books';
+                } else if (item.uri && item.uri.includes('books.google')) {
+                    return 'Google Books';
+                    
                 } else if (item.id) {
                     return 'Google Books';
                 } else {

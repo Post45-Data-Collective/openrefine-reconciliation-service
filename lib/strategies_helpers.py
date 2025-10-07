@@ -249,10 +249,10 @@ def reset_cluster_cache(req_ip, query):
 					out.write('')
 
 			if query[queryId]['type'] == 'Google_Books':
-				if os.path.isfile(f'data/cache/cluster_cache_google_{req_ip}'):
-					os.remove(f'data/cache/cluster_cache_google_{req_ip}')
+				if os.path.isfile(f'data/cache/cluster_cache_google_books_{req_ip}'):
+					os.remove(f'data/cache/cluster_cache_google_books_{req_ip}')
 
-				with open(f'data/cache/cluster_cache_google_{req_ip}','w') as out:
+				with open(f'data/cache/cluster_cache_google_books_{req_ip}','w') as out:
 					out.write('')
 
 			if query[queryId]['type'] == 'HathiTrust':

@@ -473,6 +473,11 @@ def extract_info(record_dict):
     if 'lccn' in record_dict and record_dict['lccn']:
         identifiers['LCCN'] = record_dict['lccn'].split(",")
     
+	
+    # Extract ISBN
+    if 'isbn' in record_dict and record_dict['isbn']:
+        identifiers['ISBN'] = record_dict['isbn'].split(",")
+
     # Extract OCLC
     if 'oclc_num' in record_dict and record_dict['oclc_num']:
         identifiers['OCLC'] = record_dict['oclc_num'].split(",")
@@ -503,6 +508,8 @@ def extend_data(ids,properties,passed_config):
 			response['meta'].append({"id":"hdl",'name':'hdl'})
 		if p['id'] == 'LCCN':
 			response['meta'].append({"id":"LCCN",'name':'LCCN'})
+		if p['id'] == 'ISBN':
+			response['meta'].append({"id":"ISBN",'name':'ISBN'})
 		if p['id'] == 'OCLC':
 			response['meta'].append({"id":"OCLC",'name':'OCLC'})
 		if p['id'] == 'thumbnail':
@@ -528,6 +535,7 @@ def extend_data(ids,properties,passed_config):
 			response['rows'][i]['pub_date_early'] = []
 			response['rows'][i]['pub_date_late'] = []
 			response['rows'][i]['title'] = []
+			response['rows'][i]['ISBN'] = []
 
 			uuid_val = i.split('/')[-1]
 
@@ -555,6 +563,11 @@ def extend_data(ids,properties,passed_config):
 							if 'LCCN' in rec_data:
 								for value in rec_data['LCCN']:
 									response['rows'][i]['LCCN'].append({'str':value})
+						if p['id'] == 'ISBN':
+							if 'ISBN' in rec_data:
+								for value in rec_data['ISBN']:
+									response['rows'][i]['ISBN'].append({'str':value})
+
 						if p['id'] == 'thumbnail':
 							if 'hdl' in rec_data:
 								for value in rec_data['hdl']:
