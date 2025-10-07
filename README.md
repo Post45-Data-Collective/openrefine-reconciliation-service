@@ -20,6 +20,9 @@ The tool currently works as an extension of the software application **[OpenRefi
 
 The tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis.
 
+Watch a Demo/Tutorial Video here: https://youtu.be/V9ZJoFowRJM
+
+
 ## Installing OpenRefine
 
 BookReconciler 📘💎 is designed to work with **OpenRefine**, an open-source tool for working with messy data.
