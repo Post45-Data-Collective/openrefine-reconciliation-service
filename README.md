@@ -1,9 +1,11 @@
 ![build passes](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/actions/workflows/python-app.yml/badge.svg)
 
-# BookReconciler 📘💎 (0.2) — Metadata Enrichment and Work-Level Clustering
+# BookReconciler 📘💎 — Metadata Enrichment and Work-Level Clustering
 
 - **Who is this for?** Digital humanities researchers, librarians, metadata specialists, and more.
 - **What does it do?** Finds, clusters, and enriches records for books. Adding ISBNS, HathiTrust IDs, subject headings, descriptions, page counts, publication dates, and more.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/V9ZJoFowRJM?si=JGvpEDz05yhc05kv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 **BookReconciler 📘💎** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources:
 
@@ -21,7 +23,6 @@ The tool currently works as an extension of the software application **[OpenRefi
 The tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis.
 
 Watch a Demo/Tutorial Video here: https://youtu.be/V9ZJoFowRJM
-
 
 ## Installing OpenRefine
 
