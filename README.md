@@ -167,7 +167,7 @@ When it starts, the service will be available at:
    ```
 
 6. Select a reconciliation type (e.g., `LC_Work_Id`, `OCLC_Record`, `HathiTrust`, `VIAF_Personal`, `VIAF_Title`, `Wikidata_Title`).
-7. Optionally, add "Additional Properties," like the book's author name, which may help improve match performance.
+7. Optionally, add "Additional Properties," like the author's name, which may help improve match performance.
    ![](images/additional-properties.png)
 8. Click **Start Reconciling**.
 9. Wait for reconciliation to complete. This can take seconds to hours depending on the number of values. Then, inspect matches.
