@@ -5,7 +5,9 @@
 - **Who is this for?** Digital humanities researchers, librarians, metadata specialists, and more.
 - **What does it do?** Finds, clusters, and enriches records for books. Adding ISBNS, HathiTrust IDs, subject headings, descriptions, page counts, publication dates, and more.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/V9ZJoFowRJM?si=JGvpEDz05yhc05kv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![YouTube Demo Video](images/youtube.png)](https://youtu.be/V9ZJoFowRJM)
+
+[![Watch the video](https://img.shields.io/badge/YouTube-Watch%20Demo-red?logo=youtube)](https://youtu.be/V9ZJoFowRJM)
 
 **BookReconciler 📘💎** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources:
 
@@ -22,7 +24,7 @@ The tool currently works as an extension of the software application **[OpenRefi
 
 The tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis.
 
-Watch a Demo/Tutorial Video here: https://youtu.be/V9ZJoFowRJM
+Watch a YouTube demo/tutorial Video here: https://youtu.be/V9ZJoFowRJM
 
 ## Installing OpenRefine
 
@@ -40,22 +42,57 @@ BookReconciler 📘💎 is designed to work with **OpenRefine**, an open-source 
 
 ## BookReconciler Quick Start
 
-The quickest way to get started with BookReconciler 📘💎 is to use Docker. If you don't have it installed already, install [Docker Desktop](https://www.docker.com/products/docker-desktop/), and then open Docker Desktop and make sure it's running.
+Choose the installation method that works best for your system:
 
-## Quick Start Option 1: Download and Unzip the App
+<details open>
+<summary><b>Option 1: <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac (Apple Silicon M1/M2/M3) - Standalone App (No Docker Required!) ⭐ RECOMMENDED</b></summary>
 
-We created a one-click app version of BookReconciler, which you can download, unzip, and open (as long as Docker Desktop is running).
+<br>
 
-- <a href="https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.zip" download="https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.zip">BookReconciler App (Mac)</a>
-  Note: You might get the message: "BookReconcilerApp can’t be opened because Apple cannot check it for malicious software." To bypass this message, you can open the app by right-clicking it and selecting → Open → Open.
-  <br>
-- <a href="https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.bat.zip" download="https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.bat.zip">BookReconciler App (Windows)</a>
+**Easiest option for Apple Silicon Macs** - Download the DMG and you're ready to go:
+
+1. Download [BookReconciler.dmg](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/latest)
+2. Open the DMG file
+3. Drag BookReconciler.app to your Applications folder
+4. Double-click BookReconciler.app to launch
+5. Your browser will open to <http://localhost:5001/>
+
+**No Python or Docker installation required!** The app includes everything you need.
+
+Note: You might get a security warning on first launch. Right-click the app and select **Open** → **Open** to bypass this message.
+
+</details>
+
+<details>
+<summary><b>Option 2: <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac (Intel) or <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows - Docker App</b></summary>
+
+<br>
+
+If you have an Intel Mac or Windows, use the Docker-based apps:
+
+**Requirements:** Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and make sure it's running.
+
+#### <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac (Intel or Apple Silicon):
+
+- Download: [BookReconciler App (Automator)](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.zip)
+- Unzip and double-click to launch
+- Note: Right-click → **Open** → **Open** if you get a security warning
+
+#### <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows:
+
+- Download: [BookReconciler App (Batch file)](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.bat.zip)
+- Unzip and double-click the `.bat` file to launch
 
 Once the app is launched, your browser should open to <http://localhost:5001/> where you can access the configuration interface, or you can use the OpenRefine endpoint at <http://localhost:5001/api/v1/reconcile>.
 
-## Quick Start Option 2: Run From the Command Line with Docker
+</details>
 
-You can also run Docker from the command line directly. This is a bit more flexible and works on any OS, as long as you have Docker installed and running.
+<details>
+<summary><b>Option 3: Command Line with Docker</b></summary>
+
+<br>
+
+Works on any OS with Docker installed:
 
 ```bash
 git clone https://github.com/Post45-Data-Collective/openrefine-reconciliation-service.git
@@ -63,9 +100,14 @@ cd openrefine-reconciliation-service
 docker compose up
 ```
 
+</details>
+
 ---
 
-## Option 3: Launch Your Own Server
+<details>
+<summary><b>Option 4: Launch Your Own Server (Advanced)</b></summary>
+
+<br>
 
 If you'd rather not use Docker, you can follow these steps.
 
@@ -123,22 +165,25 @@ When it starts, the service will be available at:
 - **Browser User Interface (for configuration):** <http://localhost:5001/>
 - **OpenRefine endpoint:** <http://localhost:5001/api/v1/reconcile>
 
+</details>
+
 ---
 
 ## How to Use BookReconciler with OpenRefine
 
-1. Open your project in OpenRefine.
-2. Click a column you want to reconcile.
+1. Open your dataset/project in OpenRefine.
+2. Click a column you want to reconcile—for example, the book "title" column.
 3. Choose **Reconcile → Start reconciling…**
 4. Click **Add Standard Service**.
-5. Paste the service URL:
+5. Paste the service URL for BookReconciler, which will connect you with Library of Congress, Wikidata, Google Books, and more:
 
    ```
    http://localhost:5001/api/v1/reconcile
    ```
 
 6. Select a reconciliation type (e.g., `LC_Work_Id`, `OCLC_Record`, `HathiTrust`, `VIAF_Personal`, `VIAF_Title`, `Wikidata_Title`).
-7. Click **Start Reconciling**.
+7. Optionally, add "Additional Properties," like the book's author name.
+8. Click **Start Reconciling**.
 
 ---
 

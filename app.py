@@ -49,7 +49,7 @@ app.config.update(
     POST45_RECONCILIATION_MODE='cluster', # 'single' or 'cluster'
     POST45_DATA_EXTEND_MODE='join', # or 'row'
     POST45_REMOVE_SUBTITLE=True, # if True it will remove subtitles from titles during matching
-    APP_BASE="http://localhost:5001/",
+    APP_BASE="http://127.0.0.1:5001/",
 
     POST45_STARTING_NEW_RECONCILIATION=True, # if True it will reset the cluster cache when starting a new reconciliation
 
@@ -997,4 +997,47 @@ try:
 except:
     print('error create')
     pass
+
+if __name__ == '__main__':
+    import webbrowser
+    import threading
+    import subprocess
+    import socket
+
+    # First, just open the browser
+    webbrowser.open('http://127.0.0.1:5001/')
+
+    # Check if port is already in use
+    def is_port_in_use(port):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex(('localhost', port)) == 0
+
+    if is_port_in_use(5001):
+        # Port already in use, just show notification and exit
+        try:
+            subprocess.run([
+                'osascript', '-e',
+                'display notification "BookReconciler is already running at http://127.0.0.1:5001" with title "BookReconciler"'
+            ])
+        except:
+            pass
+        print("BookReconciler is already running at http://127.0.0.1:5001")
+    else:
+        # Start the server
+        def show_notification():
+            try:
+                subprocess.run([
+                    'osascript', '-e',
+                    'display notification "BookReconciler is running at http://127.0.0.1:5001" with title "BookReconciler Started"'
+                ])
+            except:
+                pass
+
+        timer = threading.Timer(1.5, show_notification)
+        timer.daemon = True
+        timer.start()
+
+        print("BookReconciler is running at http://127.0.0.1:5001")
+        print("Press Ctrl+C to stop the server")
+        app.run(host='0.0.0.0', port=5001, debug=False)
 
