@@ -5,9 +5,9 @@
 - **Who is this for?** Digital humanities researchers, librarians, metadata specialists, and more.
 - **What does it do?** Finds, clusters, and enriches records for books. Adding ISBNS, HathiTrust IDs, subject headings, descriptions, page counts, publication dates, and more.
 
-[![YouTube Demo Video](images/youtube.png)](https://youtu.be/V9ZJoFowRJM)
-
 [![Watch the video](https://img.shields.io/badge/YouTube-Watch%20Demo-red?logo=youtube)](https://youtu.be/V9ZJoFowRJM)
+
+[![YouTube Demo Video](images/youtube.png)](https://youtu.be/V9ZJoFowRJM)
 
 **BookReconciler 📘💎** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources:
 
@@ -24,71 +24,54 @@ The tool currently works as an extension of the software application **[OpenRefi
 
 The tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis.
 
-Watch a YouTube demo/tutorial Video here: https://youtu.be/V9ZJoFowRJM
+Watch a YouTube demo/tutorial video here: https://youtu.be/V9ZJoFowRJM
 
-## Installing OpenRefine
+## 1. Install OpenRefine
 
 BookReconciler 📘💎 is designed to work with **OpenRefine**, an open-source tool for working with messy data.
 
 1. Visit the [OpenRefine download page](https://openrefine.org/download).
 2. Download the latest release for your operating system (Windows, macOS, or Linux).
 3. Unzip the package (if needed) and follow the included instructions to start OpenRefine.
-   - On macOS/Windows you can usually just double-click the launcher.
-   - On Linux, run `./refine` from the extracted folder.
 4. Once running, OpenRefine will be available at:  
    <http://127.0.0.1:3333/>
 
 ---
 
-## BookReconciler Quick Start
+## 2. Install BookReconciler
 
 Choose the installation method that works best for your system:
 
 <details open>
-<summary><b>Option 1: <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac (Apple Silicon M1/M2/M3) - Standalone App (No Docker Required!) ⭐ RECOMMENDED</b></summary>
+<summary><b>Option 1: <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac or <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows - One-Click Docker App</b></summary>
 
 <br>
-
-**Easiest option for Apple Silicon Macs** - Download the DMG and you're ready to go:
-
-1. Download [BookReconciler.dmg](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/latest)
-2. Open the DMG file
-3. Drag BookReconciler.app to your Applications folder
-4. Double-click BookReconciler.app to launch
-5. Your browser will open to <http://localhost:5001/>
-
-**No Python or Docker installation required!** The app includes everything you need.
-
-Note: You might get a security warning on first launch. Right-click the app and select **Open** → **Open** to bypass this message.
-
-</details>
-
-<details>
-<summary><b>Option 2: <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac (Intel) or <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows - Docker App</b></summary>
-
-<br>
-
-If you have an Intel Mac or Windows, use the Docker-based apps:
 
 **Requirements:** Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and make sure it's running.
 
 #### <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac (Intel or Apple Silicon):
 
-- Download: [BookReconciler App (Automator)](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.zip)
-- Unzip and double-click to launch
-- Note: Right-click → **Open** → **Open** if you get a security warning
+1. Download: [BookReconcilerApp.zip](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.zip)
+2. Unzip and double-click **BookReconcilerApp.app** to launch
+3. Your browser will open to <http://127.0.0.1:5001/>
+
+**Note:** You might get a security warning on first launch. Right-click the app and select **Open** → **Open** to bypass this message.
 
 #### <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows:
 
-- Download: [BookReconciler App (Batch file)](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.bat.zip)
-- Unzip and double-click the `.bat` file to launch
+1. Download: [BookReconcilerApp.bat.zip](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.bat.zip)
+2. Unzip and double-click **BookReconcilerApp.bat** to launch
+3. Your browser will open to <http://127.0.0.1:5001/>
 
-Once the app is launched, your browser should open to <http://localhost:5001/> where you can access the configuration interface, or you can use the OpenRefine endpoint at <http://localhost:5001/api/v1/reconcile>.
+Once launched, you can access:
+
+- **Configuration interface:** <http://127.0.0.1:5001/>
+- **OpenRefine endpoint:** <http://127.0.0.1:5001/api/v1/reconcile>
 
 </details>
 
 <details>
-<summary><b>Option 3: Command Line with Docker</b></summary>
+<summary><b>Option 2: Command Line with Docker</b></summary>
 
 <br>
 
@@ -105,7 +88,7 @@ docker compose up
 ---
 
 <details>
-<summary><b>Option 4: Launch Your Own Server (Advanced)</b></summary>
+<summary><b>Option 3: Launch Your Own Server (Advanced)</b></summary>
 
 <br>
 
@@ -162,36 +145,47 @@ flask run --host=0.0.0.0 --port=5001
 
 When it starts, the service will be available at:
 
-- **Browser User Interface (for configuration):** <http://localhost:5001/>
-- **OpenRefine endpoint:** <http://localhost:5001/api/v1/reconcile>
+- **Browser User Interface (for configuration):** <http://127.0.0.1:5001/>
+- **OpenRefine endpoint:** <http://127.0.0.1:5001/api/v1/reconcile>
 
 </details>
 
 ---
 
-## How to Use BookReconciler with OpenRefine
+## 3. Use BookReconciler in OpenRefine
 
 1. Open your dataset/project in OpenRefine.
 2. Click a column you want to reconcile—for example, the book "title" column.
 3. Choose **Reconcile → Start reconciling…**
+   ![](images/start-reconciling.png)
 4. Click **Add Standard Service**.
+   ![](images/add-service.png)
 5. Paste the service URL for BookReconciler, which will connect you with Library of Congress, Wikidata, Google Books, and more:
 
    ```
-   http://localhost:5001/api/v1/reconcile
+   http://127.0.0.1:5001/api/v1/reconcile
    ```
 
 6. Select a reconciliation type (e.g., `LC_Work_Id`, `OCLC_Record`, `HathiTrust`, `VIAF_Personal`, `VIAF_Title`, `Wikidata_Title`).
-7. Optionally, add "Additional Properties," like the book's author name.
+7. Optionally, add "Additional Properties," like the book's author name, which may help improve match performance.
+   ![](images/additional-properties.png)
 8. Click **Start Reconciling**.
+9. Wait for reconciliation to complete. This can take seconds to hours depending on the number of values. Then, inspect matches.
+   ![](images/inspect.png)
+10. Lastly, add new values—ISBNs, Subject Headings, Descriptions, etc.—based on matches. Select Edit Column -> Add columns from reconciled values...
+    ![](images/add.png)
+    Choose the values that you want to add from "Suggested Properties" (possible values are different for each service).
+    ![](images/add-columns.png)
+    They will be added to the spreadsheet.
+    ![](images/new-values.png)
 
 ---
 
-## Configure Behavior in the Browser
+## Customize BookReconciler Behavior
 
-Open <http://localhost:5001/> to adjust how BookReconciler matches, clusters, and writes back data. No code editing required.
+Open <http://127.0.0.1:5001/> to adjust how BookReconciler matches, clusters, and writes back data. No code editing required.
 
-### 🔎 Title Matching Behavior
+### Book Title Matching
 
 - **Single Match Mode**  
   Finds the _best single edition_ (manifestation) of a work.  
@@ -202,7 +196,7 @@ Open <http://localhost:5001/> to adjust how BookReconciler matches, clusters, an
   Groups _all editions_ of the same **work** into a cluster (work-level).  
   Best for gathering as many identifiers as possible or studying works across editions.
 
-### 🗂️ Extend Data Behavior (how identifiers are written back)
+### Extend Data Behavior (how identifiers are written back)
 
 - **Join Mode** — all identifiers in one cell, separated by a pipe `|`.  
   Example:
@@ -220,7 +214,7 @@ Open <http://localhost:5001/> to adjust how BookReconciler matches, clusters, an
   564738291
   ```
 
-### ✂️ Remove Subtitle from Titles
+### Remove Subtitle from Titles
 
 - **Keep Subtitles** — Titles remain as-is (e.g., _Moby-Dick: or, The Whale_).
 - **Remove Subtitles** — Attempts to strip subtitles (e.g., _Moby-Dick_).
@@ -235,7 +229,9 @@ If you plan to use OCLC’s protected endpoints, you can input your API keys on 
 
 ## Contributing
 
-Issues and pull requests are welcome! If you have questions specific to DH workflows (work-level analysis, edition clustering, identifier coverage), please open an issue with a small sample of your data.
+This project was inititally supported by an NEH grant that was cancelled in 2025. To grow and sustain this project, we welcome and encourage contributions from the broader community.
+
+Feel free to add pull requests or get in touch if you have ideas. Please also note any issues or problems.
 
 ---
 

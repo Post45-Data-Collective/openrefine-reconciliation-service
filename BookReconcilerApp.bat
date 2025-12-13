@@ -62,7 +62,7 @@ REM Stop existing container (if any)
 "%DOCKER_EXE%" rm -f %NAME% >nul 2>nul
 
 echo Starting container "%NAME%" on port %PORT% ...
-"%DOCKER_EXE%" run -d --name %NAME% -p %PORT%:5001 %IMAGE% >nul
+"%DOCKER_EXE%" run -d --name %NAME% -p 127.0.0.1:%PORT%:5001 %IMAGE% >nul
 if %ERRORLEVEL% NEQ 0 (
   echo Failed to start container. Is port %PORT% already in use?
   echo Edit this file and change: set PORT=5050
@@ -70,6 +70,6 @@ if %ERRORLEVEL% NEQ 0 (
   exit /b 1
 )
 
-start http://localhost:%PORT%
-echo Running at http://localhost:%PORT%
+start http://127.0.0.1:%PORT%
+echo Running at http://127.0.0.1:%PORT%
 echo You can close this window.
