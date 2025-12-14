@@ -1,0 +1,86 @@
+{
+  "name": "bookreconciler",
+  "version": "0.2.0",
+  "description": "BookReconciler - Metadata Enrichment and Work-Level Clustering",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:all": "electron-builder --mac --win"
+  },
+  "build": {
+    "appId": "com.post45.bookreconciler",
+    "productName": "BookReconciler",
+    "files": [
+      "main.js",
+      "preload.js",
+      "notification.html",
+      "icon.icns",
+      "icon.ico",
+      "python-dist/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "python-dist",
+        "to": "python-dist"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "icon": "icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "win": {
+      "icon": "icon.ico",
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "png2icons": "^2.0.1"
+  }
+}
