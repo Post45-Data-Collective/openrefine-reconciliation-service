@@ -9,10 +9,10 @@ exports.default = async function notarizing(context) {
   const appName = context.packager.appInfo.productFilename;
 
   const appleId = process.env.APPLE_ID;
-  const appleIdPassword = process.env.APPLE_ID_PASSWORD;
+  const appleIdPassword = process.env.APPLE_APP_SPECIFIC_PASSWORD;
 
   if (!appleId || !appleIdPassword) {
-    console.log('Skipping notarization: APPLE_ID or APPLE_ID_PASSWORD not set');
+    console.log('Skipping notarization: APPLE_ID or APPLE_APP_SPECIFIC_PASSWORD not set');
     return;
   }
 
