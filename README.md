@@ -43,25 +43,27 @@ BookReconciler 📘💎 is designed to work with **OpenRefine**, an open-source 
 Choose the installation method that works best for your system:
 
 <details open>
-<summary><b>Option 1: <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac or <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows - One-Click Docker App</b></summary>
+<summary><b>Option 1: <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac or <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows - Desktop App (Recommended)</b></summary>
 
 <br>
 
-**Requirements:** Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and make sure it's running.
+**No installation required!** Download and run the standalone desktop app:
 
-#### <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac (Intel or Apple Silicon):
+#### <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> macOS (Intel or Apple Silicon):
 
-1. Download: [BookReconcilerApp.zip](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.zip)
-2. Unzip and double-click **BookReconcilerApp.app** to launch
-3. Your browser will open to <http://127.0.0.1:5001/>
+1. **[Download the latest macOS app](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/latest)** (`.dmg` or `.zip`)
+2. Open the `.dmg` file and drag **BookReconciler.app** to your Applications folder (or unzip and double-click the `.app`)
+3. Launch **BookReconciler** — your browser will automatically open to <http://127.0.0.1:5001/>
 
-**Note:** You might get a security warning on first launch. Right-click the app and select **Open** → **Open** to bypass this message.
+**Note:** On first launch, macOS may show a security warning. Right-click the app and select **Open** → **Open** to bypass.
 
 #### <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows:
 
-1. Download: [BookReconcilerApp.bat.zip](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.0-beta.1/BookReconcilerApp.bat.zip)
-2. Unzip and double-click **BookReconcilerApp.bat** to launch
-3. Your browser will open to <http://127.0.0.1:5001/>
+1. **[Download the latest Windows installer](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/latest)** (`.exe`)
+2. Run the installer and follow the prompts
+3. Launch **BookReconciler** from your Start Menu — your browser will automatically open to <http://127.0.0.1:5001/>
+
+**Note:** Windows may show a SmartScreen warning. Click **More info** → **Run anyway**.
 
 Once launched, you can access:
 
@@ -71,7 +73,28 @@ Once launched, you can access:
 </details>
 
 <details>
-<summary><b>Option 2: Command Line with Docker</b></summary>
+<summary><b>Option 2: Docker App (Mac/Windows)</b></summary>
+
+<br>
+
+**Requirements:** Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and make sure it's running.
+
+#### <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac (Intel or Apple Silicon):
+
+1. Download: [BookReconcilerApp.zip](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.1-beta.1/BookReconcilerApp.zip)
+2. Unzip and double-click **BookReconcilerApp.app** to launch
+3. Your browser will open to <http://127.0.0.1:5001/>
+
+#### <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows:
+
+1. Download: [BookReconcilerApp.bat.zip](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/download/v0.2.1-beta.1/BookReconcilerApp.bat.zip)
+2. Unzip and double-click **BookReconcilerApp.bat** to launch
+3. Your browser will open to <http://127.0.0.1:5001/>
+
+</details>
+
+<details>
+<summary><b>Option 3: Command Line with Docker</b></summary>
 
 <br>
 
@@ -88,7 +111,7 @@ docker compose up
 ---
 
 <details>
-<summary><b>Option 3: Launch Your Own Server (Advanced)</b></summary>
+<summary><b>Option 4: Launch Your Own Server (Advanced)</b></summary>
 
 <br>
 
@@ -98,8 +121,6 @@ If you'd rather not use Docker, you can follow these steps.
 
 - Python 3.10+
 - macOS / Linux / Windows
-- [OpenRefine](https://openrefine.org/) (see below)
-- (Optional) OCLC API credentials if you plan to query WorldCat protected endpoints
 
 ### 1) Clone this GitHub repository
 
