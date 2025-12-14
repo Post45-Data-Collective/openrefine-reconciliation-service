@@ -3,6 +3,10 @@
   "version": "0.2.0",
   "description": "BookReconciler - Metadata Enrichment and Work-Level Clustering",
   "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Post45-Data-Collective/openrefine-reconciliation-service.git"
+  },
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
