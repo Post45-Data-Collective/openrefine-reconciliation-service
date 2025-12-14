@@ -34,7 +34,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Clean build directories (Unix)
         if: runner.os != 'Windows'
@@ -65,8 +65,8 @@ jobs:
           release: true
           package_root: electron
           skip_build: true
-          # Uncomment these when you set up code signing:
-          # mac_certs: ${{ secrets.mac_certs }}
-          # mac_certs_password: ${{ secrets.mac_certs_password }}
-          # windows_certs: ${{ secrets.windows_certs }}
-          # windows_certs_password: ${{ secrets.windows_certs_password }}
+          mac_certs: ${{ secrets.MAC_CERTS }}
+          mac_certs_password: ${{ secrets.MAC_CERTS_PASSWORD }}
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
