@@ -33,6 +33,10 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Clean build directories
+        working-directory: electron
+        run: rm -rf python-dist dist build
+
       - name: Build Python app with PyInstaller
         working-directory: electron
         run: pyinstaller app-electron.spec --distpath python-dist --clean
