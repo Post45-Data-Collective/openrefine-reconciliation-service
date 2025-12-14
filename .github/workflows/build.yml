@@ -33,9 +33,23 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Clean build directories
+      - name: Clean build directories (Unix)
+        if: runner.os != 'Windows'
         working-directory: electron
-        run: rm -rf python-dist dist build
+        run: rm -rf python-dist dist build node_modules
+
+      - name: Clean build directories (Windows)
+        if: runner.os == 'Windows'
+        working-directory: electron
+        run: |
+          if (Test-Path python-dist) { Remove-Item -Recurse -Force python-dist }
+          if (Test-Path dist) { Remove-Item -Recurse -Force dist }
+          if (Test-Path build) { Remove-Item -Recurse -Force build }
+          if (Test-Path node_modules) { Remove-Item -Recurse -Force node_modules }
+
+      - name: Install Node dependencies
+        working-directory: electron
+        run: npm install
 
       - name: Build Python app with PyInstaller
         working-directory: electron
@@ -47,6 +61,7 @@ jobs:
           github_token: ${{ secrets.github_token }}
           release: true
           package_root: electron
+          skip_build: true
           # Uncomment these when you set up code signing:
           # mac_certs: ${{ secrets.mac_certs }}
           # mac_certs_password: ${{ secrets.mac_certs_password }}
