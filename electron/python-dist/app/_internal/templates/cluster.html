@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BookReconciler Cluster</title>
+
+    <script src="/static/vue.global.js"></script>
+    <link rel="stylesheet" href="/static/bulma.min.css" />
+
+</head>
+<body>
+
+
+    <style>
+        /* Optional: Make columns take full height */
+        html, body {
+            height: 100%;
+            padding: 2em;
+        }
+        
+        /* Light mode (default) */
+        @media (prefers-color-scheme: light) {
+            html, body {
+                background-color: #f5f5f5;
+                color: #4a4a4a;
+            }
+            tr:hover {
+                background-color: #fafafa !important;
+            }
+        }
+        
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            html, body {
+                background-color: #1a1a1a;
+                color: #dbdbdb;
+            }
+            .table {
+                background-color: #242424;
+                color: #dbdbdb;
+            }
+            .table thead th {
+                background-color: #2a2a2a;
+                color: #dbdbdb;
+                border-color: #363636;
+            }
+            .table tbody tr {
+                background-color: #242424;
+                border-color: #363636;
+            }
+            .table.is-striped tbody tr:nth-child(even) {
+                background-color: #2a2a2a;
+            }
+            .table.is-hoverable tbody tr:hover {
+                background-color: #363636 !important;
+            }
+            .table td, .table th {
+                border-color: #363636;
+                color: #dbdbdb;
+            }
+            .button.is-primary {
+                background-color: #00d1b2;
+                color: #fff;
+            }
+            .button.is-primary:hover {
+                background-color: #00c4a7;
+            }
+            .button.is-primary svg {
+                fill: #fff;
+            }
+            .is-size-3 {
+                color: #dbdbdb;
+            }
+            a {
+                color: #3273dc;
+            }
+            a:hover {
+                color: #485fc7;
+            }
+        }
+        
+        .check{
+            width: 20px;
+            height: 20px;
+        }
+        tr{
+            cursor: pointer;
+        }
+        svg {
+            width: 30px;
+            height: 30px;
+            margin: 0 auto;
+            margin-right: 1em;
+        }
+        .manage-cluster{
+            position: absolute;
+            top: 1em;
+            right: 1em;
+        }
+    </style>
+
+
+
+    <div id="app">
+        <div class="manage-cluster">
+
+            <a class="button is-primary" :href="returnService()" target="_blank">
+                <svg version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="m15.195 92.938v-17.16c0-0.57031 0.46094-1.0312 1.0312-1.0312h67.547c0.57031 0 1.0312 0.46094 1.0312 1.0312v17.16h4.4922c0.71094 0 1.3555-0.28906 1.8203-0.75781 0.46875-0.46875 0.75781-1.1133 0.75781-1.8203l0.003906-80.719c0-0.71094-0.28906-1.3555-0.75781-1.8203-0.46875-0.46875-1.1133-0.75781-1.8203-0.75781h-78.598c-0.71094 0-1.3555 0.28906-1.8203 0.75781-0.46875 0.46875-0.75781 1.1133-0.75781 1.8203v80.719c0 0.71094 0.28906 1.3555 0.75781 1.8203 0.46875 0.46875 1.1133 0.75781 1.8203 0.75781zm1.0312-77.531h67.547c0.57031 0 1.0312 0.46094 1.0312 1.0312v21.027c0 0.57031-0.46094 1.0312-1.0312 1.0312l-67.547 0.003906c-0.57031 0-1.0312-0.46094-1.0312-1.0312v-21.027c0-0.57031 0.46094-1.0312 1.0312-1.0312zm0 29.102h67.547c0.57031 0 1.0312 0.46094 1.0312 1.0312v21.027c0 0.57031-0.46094 1.0312-1.0312 1.0312l-67.547 0.003906c-0.57031 0-1.0312-0.46094-1.0312-1.0312v-21.027c0-0.57031 0.46094-1.0312 1.0312-1.0312zm66.516 41.254h-65.484v8.2109c0 0.57031-0.46094 1.0312-1.0312 1.0312h-5.5234c-1.2773 0-2.4375-0.52344-3.2773-1.3633-0.83984-0.83984-1.3633-2.0039-1.3633-3.2773v-80.723c0-1.2773 0.52344-2.4375 1.3633-3.2773 0.83984-0.83984 2-1.3633 3.2773-1.3633h78.594c1.2773 0 2.4375 0.52344 3.2773 1.3633 0.83984 0.83984 1.3633 2 1.3633 3.2773v80.719c0 1.2773-0.52344 2.4375-1.3633 3.2773-0.83984 0.83984-2.0039 1.3633-3.2773 1.3633h-5.5234c-0.57031 0-1.0312-0.46094-1.0312-1.0312v-8.2109zm-65.484-2.0625v-6.8906h65.484v6.8906zm31.711-18.16h-31.711v-18.969h31.711zm2.0625-18.969h31.715v18.969h-31.715zm-2.0625-10.133h-31.711v-18.969h31.711zm2.0625-18.969h31.715v18.969h-31.715zm-24.234 10.516c-0.57031 0-1.0312-0.46094-1.0312-1.0312s0.46094-1.0312 1.0312-1.0312h12.004c0.57031 0 1.0312 0.46094 1.0312 1.0312s-0.46094 1.0312-1.0312 1.0312zm34.406 0c-0.57031 0-1.0312-0.46094-1.0312-1.0312s0.46094-1.0312 1.0312-1.0312h12.004c0.57031 0 1.0312 0.46094 1.0312 1.0312s-0.46094 1.0312-1.0312 1.0312zm-34.406 29.102c-0.57031 0-1.0312-0.46094-1.0312-1.0312 0-0.57031 0.46094-1.0312 1.0312-1.0312h12.004c0.57031 0 1.0312 0.46094 1.0312 1.0312 0 0.57031-0.46094 1.0312-1.0312 1.0312zm34.406 0c-0.57031 0-1.0312-0.46094-1.0312-1.0312 0-0.57031 0.46094-1.0312 1.0312-1.0312h12.004c0.57031 0 1.0312 0.46094 1.0312 1.0312 0 0.57031-0.46094 1.0312-1.0312 1.0312z" fill-rule="evenodd" filter="url(#blue-glow2)"/>
+                </svg>Manage All Clusters
+            </a>
+        </div>
+
+        <!-- Save notification -->
+        <div v-if="showSaveNotification" class="notification is-success" 
+             :style="{ opacity: notificationOpacity, transition: 'opacity 0.5s ease-in-out' }"
+             style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; min-width: 250px;">
+            <button @click="showSaveNotification = false" class="delete"></button>
+            Cluster saved successfully!
+        </div>
+
+        
+
+        <div class="is-size-3">${data.orginal.title}$</div>
+        <div class="is-size-3">${data.orginal.author}$</div>
+
+        <div>
+            <table class="table is-striped is-hoverable ">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Language</th>
+                        <th>Type/Source</th>
+                        <th>Details</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in dataDisplay" :key="getItemKey(item)" >
+
+                        <td>
+                            <input v-model="item.included" :id="getItemKey(item)" class="check" type="checkbox">
+                        </td>
+                        
+
+                        <td @click="toggleCheckbox(getItemKey(item))">${getDisplayTitle(item)}$</td>
+                        <td @click="toggleCheckbox(getItemKey(item))">${getDisplayAuthor(item)}$</td>
+
+                        <td @click="toggleCheckbox(getItemKey(item))">${getDisplayLanguage(item)}$</td>
+                        <td @click="toggleCheckbox(getItemKey(item))">${getItemType(item)}$</td>
+                        <td @click="toggleCheckbox(getItemKey(item))">${getItemDetails(item)}$</td>
+                        <td><a :href="getItemLink(item)" target="_blank">${getItemLinkText(item)}$</a></td>
+
+                    </tr>                  
+                </tbody>
+            </table>
+            
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const { createApp } = Vue
+
+        let vue = createApp({
+          delimiters: ["${", "}$"],
+          // for standalone
+          compilerOptions: {
+            delimiters: ["${", "}$"]
+          },          
+          
+          
+          data() {
+            return {
+
+                data: {{data|safe}},
+                dataDisplay: [],
+                cluster_id: '{{ cluster_id }}',
+                showSaveNotification: false,
+                notificationOpacity: 1
+            }
+          },
+          
+          computed: {
+            
+          },
+
+          methods:{
+
+            returnService() {
+                // Return the service name from the URL
+                return "/clusters/" + location.pathname.split('/cluster/')[1].split('/')[0]
+            },
+
+            setVal(itemKey){
+                // Find the item in dataDisplay and toggle its included value
+                const item = this.dataDisplay.find(item => this.getItemKey(item) === itemKey);
+                if (item) {
+                    item.included = !item.included;
+                    // Auto-save after change
+                    this.saveCluster();
+                }
+            },
+
+
+            toggleCheckbox(itemKey) {
+                // Find the item in dataDisplay and toggle its included value
+                const item = this.dataDisplay.find(item => this.getItemKey(item) === itemKey);
+                if (item) {
+                    item.included = !item.included;
+                    // Auto-save after change
+                    this.saveCluster();
+                }
+            },
+            
+            // Data structure abstraction methods
+            getItemKey(item) {
+                // Generate unique key for different item types
+                if (item.ht_bib_key) {
+                    return item.ht_bib_key; // HathiTrust format
+                } else if (item.uri) {
+                    return item.uri; // Library of Congress format
+                } else if (item.id) {
+                    return item.id; // Generic format
+                } else {
+                    // Fallback: create key from available data
+                    return `${item.title || 'unknown'}_${item.author || 'unknown'}_${Math.random()}`;
+                }
+            },
+            
+            getDisplayTitle(item) {
+                // Extract title from different formats
+                if (item.title) {
+                    return item.title; // HathiTrust format
+                } else if (item.aLabel) {
+                    return item.aLabel; // Library of Congress format
+                } else if (item.volumeInfo && item.volumeInfo.title) {
+                    // Google Books format
+                    let title = item.volumeInfo.title;
+                    if (item.volumeInfo.subtitle) {
+                        title += ': ' + item.volumeInfo.subtitle;
+                    }
+                    return title;
+                } else if (item.mainTitle) {
+                    return item.mainTitle; // OCLC/WorldCat format
+                } else if (item.name) {
+                    return item.name; // Generic format
+                } else {
+                    return 'Unknown Title';
+                }
+            },
+            
+            getDisplayAuthor(item) {
+                // Extract author from different formats
+                if (item.author) {
+                    return item.author; // HathiTrust format
+                } else if (item.more && item.more.contributors && item.more.contributors.length > 0) {
+                    return item.more.contributors[0]; // Library of Congress format
+                } else if (item.volumeInfo && item.volumeInfo.authors && item.volumeInfo.authors.length > 0) {
+                    return item.volumeInfo.authors.join(', '); // Google Books format
+                } else if (item.creator) {
+                    return item.creator; // OCLC/WorldCat format
+                } else if (item.contributor) {
+                    return item.contributor; // Generic format
+                } else {
+                    return 'Unknown Author';
+                }
+            },
+            
+            getDisplayLanguage(item) {
+                // Extract language from different formats
+                if (item.lang) {
+                    return item.lang; // HathiTrust format
+                } else if (item.itemLanguage) {
+                    return item.itemLanguage; // OCLC/WorldCat format
+                } else if (item.language) {
+                    return item.language; // Library of Congress enriched format
+                } else if (item.volumeInfo && item.volumeInfo.language) {
+                    return item.volumeInfo.language; // Google Books format
+                } else if (item.languages && Array.isArray(item.languages) && item.languages.length > 0) {
+                    return item.languages[0]; // Multiple languages, take first
+                } else if (item.more && item.more.language) {
+                    return item.more.language; // Alternative LC format
+                } else if (item.more && item.more.languages && Array.isArray(item.more.languages) && item.more.languages.length > 0) {
+                    return item.more.languages[0]; // Multiple languages in more object
+                } else {
+                    return 'Unknown';
+                }
+            },
+            
+            getItemType(item) {
+                // Identify the source/type of the item
+                if (item.ht_bib_key) {
+                    return 'HathiTrust';
+                } else if (item.uri && item.uri.includes('id.loc.gov')) {
+                    return 'Library of Congress';
+                } else if (item.uri && item.uri.includes('viaf.org')) {
+                    return 'VIAF';
+                } else if (item.uri && item.uri.includes('worldcat.org')) {
+                    return 'WorldCat';
+                } else if ((item.uri && item.uri.includes('googleapis.com')) || item.id) {
+                    return 'Google Books';
+                } else if ((item.uri && item.uri.includes('books.google')) || item.id) {
+                    return 'Google Books';
+
+
+
+
+                } else {
+                    return 'Unknown Source';
+                }
+            },
+            
+            getItemDetails(item) {
+                // Show relevant metadata details
+                const details = [];
+                
+                // Responsibility statement (from Library of Congress and OCLC)
+                if (item.responsibilityStatement) {
+                    details.push(`Responsibility: ${item.responsibilityStatement}`);
+                } else if (item.statementOfResponsibility) {
+                    details.push(`Responsibility: ${item.statementOfResponsibility}`);
+                }
+                
+                // Publication year
+                if (item.pub_date) {
+                    details.push(`Year: ${item.pub_date}`);
+                } else if (item.originDate) {
+                    details.push(`Year: ${item.originDate}`);
+                } else if (item.publicationDate) {
+                    details.push(`Year: ${item.publicationDate}`); // OCLC format
+                } else if (item.volumeInfo && item.volumeInfo.publishedDate) {
+                    details.push(`Year: ${item.volumeInfo.publishedDate}`);
+                } else if (item.provisionActivities && item.provisionActivities.length > 0 && item.provisionActivities[0].date) {
+                    details.push(`Year: ${item.provisionActivities[0].date}`);
+                }
+                
+                // Identifiers
+                if (item.identifiers && item.identifiers.length > 0) {
+                    const firstId = item.identifiers[0];
+                    details.push(`${firstId.type}: ${firstId.value}`);
+                } else if (item.volumeInfo && item.volumeInfo.industryIdentifiers && item.volumeInfo.industryIdentifiers.length > 0) {
+                    // Google Books identifiers
+                    const firstId = item.volumeInfo.industryIdentifiers[0];
+                    details.push(`${firstId.type}: ${firstId.identifier}`);
+                } else if (item.isbns && item.isbns.length > 0) {
+                    // OCLC ISBNs
+                    details.push(`ISBN: ${item.isbns[0]}`);
+                }
+                
+                // OCLC number for HathiTrust and OCLC records
+                if (item.oclc) {
+                    details.push(`OCLC: ${item.oclc}`);
+                } else if (item.oclcNumber) {
+                    details.push(`OCLC: ${item.oclcNumber}`);
+                }
+                
+                // Access rights for HathiTrust
+                if (item.rights) {
+                    details.push(`Rights: ${item.rights}`);
+                }
+                
+                // Publisher info
+                if (item.provisionActivities && item.provisionActivities.length > 0) {
+                    const provision = item.provisionActivities[0];
+                    if (provision.agent || provision.place) {
+                        details.push(`Pub: ${provision.agent || ''} ${provision.place || ''}`.trim());
+                    }
+                } else if (item.volumeInfo && item.volumeInfo.publisher) {
+                    details.push(`Pub: ${item.volumeInfo.publisher}`);
+                }
+                
+                // Page count for Google Books
+                if (item.volumeInfo && item.volumeInfo.pageCount) {
+                    details.push(`Pages: ${item.volumeInfo.pageCount}`);
+                }
+                
+                return details.join('; ') || 'No details available';
+            },
+            
+            getItemLink(item) {
+                // Generate appropriate link for the item
+                if (item.htid) {
+                    return `https://catalog.hathitrust.org/Record/${item.ht_bib_key}`;
+                } else if (item.oclcNumber) {
+                    // OCLC/WorldCat - construct URL from OCLC number
+                    return `https://worldcat.org/oclc/${item.oclcNumber}`;
+                } else if (item.uri) {
+                    return item.uri;
+                } else if (item.selfLink) {
+                    // Google Books direct link
+                    // return item.selfLink;
+                     return `https://books.google.com/books?id=${item.id}`;
+
+                } else if (item.id) {
+                    // Google Books - construct URL from ID
+                    // return `https://www.googleapis.com/books/v1/volumes/${item.id}`;
+                    return `https://books.google.com/books?id=${item.id}`;
+                } else if (item.url) {
+                    return item.url;
+                } else {
+                    return '#';
+                }
+            },
+            
+            getItemLinkText(item) {
+                // Generate appropriate link text
+                if (item.htid) {
+                    return 'HathiTrust';
+                } else if (item.oclcNumber) {
+                    return 'WorldCat';
+                } else if (item.uri && item.uri.includes('id.loc.gov')) {
+                    return 'id.loc.gov';
+                } else if (item.uri && item.uri.includes('viaf.org')) {
+                    return 'VIAF';
+                } else if (item.uri && item.uri.includes('worldcat.org')) {
+                    return 'WorldCat';
+                } else if (item.uri && item.uri.includes('googleapis.com')) {
+                    return 'Google Books';
+                } else if (item.uri && item.uri.includes('books.google')) {
+                    return 'Google Books';
+                    
+                } else if (item.id) {
+                    return 'Google Books';
+                } else {
+                    return 'View';
+                }
+            },
+            
+            combineData() {
+                // Combine cluster and cluster_excluded into single array with included flag
+                const combined = [];
+                
+                // Handle standard cluster structure (all strategies now use this)
+                if (this.data.cluster && Array.isArray(this.data.cluster)) {
+                    this.data.cluster.forEach(item => {
+                        combined.push({
+                            ...item,
+                            included: true
+                        });
+                    });
+                }
+                
+                // Add items from cluster_excluded with included: false
+                if (this.data.cluster_excluded && Array.isArray(this.data.cluster_excluded)) {
+                    this.data.cluster_excluded.forEach(item => {
+                        combined.push({
+                            ...item,
+                            included: false
+                        });
+                    });
+                }
+                
+                this.dataDisplay = combined;
+            },
+            
+            updateDataFromDisplay() {
+                // Convert dataDisplay back to original data format
+                const newCluster = [];
+                const newClusterExcluded = [];
+                
+                this.dataDisplay.forEach(item => {
+                    // Create a copy without the included property
+                    const itemCopy = { ...item };
+                    delete itemCopy.included;
+                    
+                    if (item.included) {
+                        newCluster.push(itemCopy);
+                    } else {
+                        newClusterExcluded.push(itemCopy);
+                    }
+                });
+                
+                // Update the data object
+                this.data.cluster = newCluster;
+                this.data.cluster_excluded = newClusterExcluded;
+            },
+            
+            getFormattedData() {
+                // Returns a new object with the updated cluster arrays based on dataDisplay
+                const formattedData = { ...this.data };
+                
+                // Standard format for all strategies
+                const newCluster = [];
+                const newClusterExcluded = [];
+                
+                this.dataDisplay.forEach(item => {
+                    // Create a copy without the included property
+                    const itemCopy = { ...item };
+                    delete itemCopy.included;
+                    
+                    if (item.included) {
+                        newCluster.push(itemCopy);
+                    } else {
+                        newClusterExcluded.push(itemCopy);
+                    }
+                });
+                
+                formattedData.cluster = newCluster;
+                formattedData.cluster_excluded = newClusterExcluded;
+                
+                console.log("Formatted Data:", formattedData);
+                return formattedData;
+            },
+            
+            async saveCluster() {
+                // Get the formatted data and send to backend
+                let dataToSave = this.getFormattedData();
+                
+                dataToSave = {
+                    data: dataToSave,
+                    cluster_id: this.cluster_id
+                };
+                try {
+                    const response = await fetch('/api/local/save_cluster', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dataToSave)
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Cluster auto-saved successfully:', result);
+                        
+                        // Show success notification
+                        this.showSaveNotification = true;
+                        this.notificationOpacity = 1;
+                        
+                        // Start fade out after 2 seconds
+                        setTimeout(() => {
+                            this.notificationOpacity = 0;
+                            // Hide completely after fade completes
+                            setTimeout(() => {
+                                this.showSaveNotification = false;
+                                this.notificationOpacity = 1; // Reset for next time
+                            }, 500);
+                        }, 2000);
+                        
+                    } else {
+                        console.error('Failed to auto-save cluster:', response.status);
+                        // alert with error message and what happened
+                        alert('Failed to auto-save cluster. ' + response.status + ' ' + response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error auto-saving cluster:', error);
+                }
+            }
+
+            
+
+          },
+
+          created(){  
+            this.combineData();
+          },
+          
+          mounted() {
+            this.combineData();
+          },
+          
+          watch: {
+            data: {
+              handler() {
+                this.combineData();
+              },
+              deep: true
+            }
+          }
+        }).mount('#app')
+
+
+    </script>
+
+
+
+
+</body>
+</html>

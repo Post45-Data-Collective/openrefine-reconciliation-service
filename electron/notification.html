@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>BookReconciler</title>
+    <style>
+        body {
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        h2 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .info {
+            color: #666;
+            margin: 10px 0;
+        }
+        .url {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #0066cc;
+            margin: 10px 0;
+        }
+        .hint {
+            color: #999;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2> Success: BookReconciler 📘💎 is running.</h2>
+        <p class="info">You can configure BookReconciler at this URL:</p>
+        <p class="url">http://127.0.0.1:5001</p>
+        <p class="info">To use BookReconciler with OpenRefine, you will need to add a Reconciliation Service to OpenRefine by copying and pasting this URL:</p>
+        <p class="url">http://127.0.0.1:5001/api/v1/reconcile</p>
+        <p class="info">BookReconciler will only work while this app is running.</p>
+
+        <p class="hint">🛑 To stop BookReconciler, simply close this window.</p>
+    </div>
+</body>
+</html>
