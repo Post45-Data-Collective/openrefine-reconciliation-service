@@ -5,6 +5,7 @@ import requests
 import os
 import xml.etree.ElementTree as ET
 import json
+from .paths import CACHE_DIR
 
 GENERIC_HEADERS = {
 	'User-Agent':'Openrefine Post45 Reconcilation Client'
@@ -87,8 +88,8 @@ def _download_viaf_cluster_rdf(uri):
 
 	# if we already downloaded in cache
 	passed_id_escaped = uri.replace(":",'_').replace("/",'_')
-	if os.path.isfile(f'data/cache/cluster_{passed_id_escaped}'):
-		with open(f'data/cache/cluster_{passed_id_escaped}', 'r') as f:
+	if os.path.isfile(f'{CACHE_DIR}/cluster_{passed_id_escaped}'):
+		with open(f'{CACHE_DIR}/cluster_{passed_id_escaped}', 'r') as f:
 			data = f.read()
 
 		return data
@@ -114,7 +115,7 @@ def _download_viaf_cluster_rdf(uri):
 		
 
 		file_name = uri.replace(':','_').replace('/','_')
-		with open(f'data/cache/cluster_{file_name}','w') as out:
+		with open(f'{CACHE_DIR}/cluster_{file_name}','w') as out:
 			out.write(response.text)
 
 
@@ -242,31 +243,31 @@ def reset_cluster_cache(req_ip, query):
 		if 'type' in query[queryId]:
 
 			if query[queryId]['type'] == 'LC_Work_Id':
-				if os.path.isfile(f'data/cache/cluster_cache_id_{req_ip}'):
-					os.remove(f'data/cache/cluster_cache_id_{req_ip}')
+				if os.path.isfile(f'{CACHE_DIR}/cluster_cache_id_{req_ip}'):
+					os.remove(f'{CACHE_DIR}/cluster_cache_id_{req_ip}')
 
-				with open(f'data/cache/cluster_cache_id_{req_ip}','w') as out:
+				with open(f'{CACHE_DIR}/cluster_cache_id_{req_ip}','w') as out:
 					out.write('')
 
 			if query[queryId]['type'] == 'Google_Books':
-				if os.path.isfile(f'data/cache/cluster_cache_google_books_{req_ip}'):
-					os.remove(f'data/cache/cluster_cache_google_books_{req_ip}')
+				if os.path.isfile(f'{CACHE_DIR}/cluster_cache_google_books_{req_ip}'):
+					os.remove(f'{CACHE_DIR}/cluster_cache_google_books_{req_ip}')
 
-				with open(f'data/cache/cluster_cache_google_books_{req_ip}','w') as out:
+				with open(f'{CACHE_DIR}/cluster_cache_google_books_{req_ip}','w') as out:
 					out.write('')
 
 			if query[queryId]['type'] == 'HathiTrust':
-				if os.path.isfile(f'data/cache/cluster_cache_hathi_{req_ip}'):
-					os.remove(f'data/cache/cluster_cache_hathi_{req_ip}')
+				if os.path.isfile(f'{CACHE_DIR}/cluster_cache_hathi_{req_ip}'):
+					os.remove(f'{CACHE_DIR}/cluster_cache_hathi_{req_ip}')
 
-				with open(f'data/cache/cluster_cache_hathi_{req_ip}','w') as out:
+				with open(f'{CACHE_DIR}/cluster_cache_hathi_{req_ip}','w') as out:
 					out.write('')
 
 			if query[queryId]['type'] == 'OCLC_Record':
-				if os.path.isfile(f'data/cache/cluster_cache_oclc_{req_ip}'):
-					os.remove(f'data/cache/cluster_cache_oclc_{req_ip}')
+				if os.path.isfile(f'{CACHE_DIR}/cluster_cache_oclc_{req_ip}'):
+					os.remove(f'{CACHE_DIR}/cluster_cache_oclc_{req_ip}')
 
-				with open(f'data/cache/cluster_cache_oclc_{req_ip}','w') as out:
+				with open(f'{CACHE_DIR}/cluster_cache_oclc_{req_ip}','w') as out:
 					out.write('')					
 
 
@@ -275,7 +276,7 @@ def build_cluster_data(req_ip,service):
 		Builds the cluster data for the given request IP.
 		This function reads the cluster cache file and builds a dictionary of clusters.
 	"""
-	if not os.path.isfile(f'data/cache/cluster_cache_{service}_{req_ip}'):
+	if not os.path.isfile(f'{CACHE_DIR}/cluster_cache_{service}_{req_ip}'):
 		return {}
 	
 	print(f"Building cluster data for {req_ip}"	)
@@ -283,12 +284,12 @@ def build_cluster_data(req_ip,service):
 	cluster_stats = {}
 	cluster_stats_lang = {}
 	
-	with open(f'data/cache/cluster_cache_{service}_{req_ip}','r') as f:
+	with open(f'{CACHE_DIR}/cluster_cache_{service}_{req_ip}','r') as f:
 		for line in f:
 			print(line)
 			line = line.strip()
-			if os.path.isfile(f'data/cache/{line}'):
-				with open(f'data/cache/{line}', 'r') as cluster_file:
+			if os.path.isfile(f'{CACHE_DIR}/{line}'):
+				with open(f'{CACHE_DIR}/{line}', 'r') as cluster_file:
 					cluster_data = cluster_file.read()
 					cluster_data = json.loads(cluster_data)
 					

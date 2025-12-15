@@ -19,6 +19,7 @@ from lib.strategies_viaf import extend_data as extend_data_viaf
 from lib.strategies_oclc import extend_data as extend_data_worldcat
 from lib.strategies_google_books import extend_data as extend_data_google
 from lib.strategies_hathitrust import extend_data as extend_data_hathi
+from lib.paths import get_hathi_data_dir, CACHE_DIR
 
 
 
@@ -162,8 +163,8 @@ def hello_world():
 @app.route("/cluster/hathi/<hathi_uuid>")
 def cluster_hathi(hathi_uuid):
 
-    if os.path.isfile(f'data/cache/cluster_hathi_{hathi_uuid}'):
-        data = json.load(open(f'data/cache/cluster_hathi_{hathi_uuid}'))
+    if os.path.isfile(f'{CACHE_DIR}/cluster_hathi_{hathi_uuid}'):
+        data = json.load(open(f'{CACHE_DIR}/cluster_hathi_{hathi_uuid}'))
         json_data = jsonify(data).get_data(as_text=True)
 
     return render_template('cluster.html', data=json_data, cluster_id=f'cluster_hathi_{hathi_uuid}')
@@ -171,8 +172,8 @@ def cluster_hathi(hathi_uuid):
 @app.route("/cluster/id/<id_uuid>")
 def cluster_id(id_uuid):
 
-    if os.path.isfile(f'data/cache/cluster_id_{id_uuid}'):
-        data = json.load(open(f'data/cache/cluster_id_{id_uuid}'))
+    if os.path.isfile(f'{CACHE_DIR}/cluster_id_{id_uuid}'):
+        data = json.load(open(f'{CACHE_DIR}/cluster_id_{id_uuid}'))
         json_data = jsonify(data).get_data(as_text=True)
 
     return render_template('cluster.html', data=json_data, cluster_id=f'cluster_id_{id_uuid}')
@@ -180,8 +181,8 @@ def cluster_id(id_uuid):
 @app.route("/cluster/google_books/<google_uuid>")
 def cluster_google_books(google_uuid):
 
-    if os.path.isfile(f'data/cache/cluster_google_books_{google_uuid}'):
-        data = json.load(open(f'data/cache/cluster_google_books_{google_uuid}'))
+    if os.path.isfile(f'{CACHE_DIR}/cluster_google_books_{google_uuid}'):
+        data = json.load(open(f'{CACHE_DIR}/cluster_google_books_{google_uuid}'))
         json_data = jsonify(data).get_data(as_text=True)
 
     return render_template('cluster.html', data=json_data, cluster_id=f'cluster_google_books_{google_uuid}')
@@ -189,8 +190,8 @@ def cluster_google_books(google_uuid):
 @app.route("/cluster/oclc/<oclc_uuid>")
 def cluster_oclc(oclc_uuid):
 
-    if os.path.isfile(f'data/cache/cluster_oclc_{oclc_uuid}'):
-        data = json.load(open(f'data/cache/cluster_oclc_{oclc_uuid}'))
+    if os.path.isfile(f'{CACHE_DIR}/cluster_oclc_{oclc_uuid}'):
+        data = json.load(open(f'{CACHE_DIR}/cluster_oclc_{oclc_uuid}'))
         json_data = jsonify(data).get_data(as_text=True)
 
     return render_template('cluster.html', data=json_data, cluster_id=f'cluster_oclc_{oclc_uuid}')
@@ -201,7 +202,7 @@ def clusters(service):
 
     req_ip = request.remote_addr
     cluster_data = {}
-    if os.path.isfile(f'data/cache/cluster_cache_{service}_{req_ip}'):
+    if os.path.isfile(f'{CACHE_DIR}/cluster_cache_{service}_{req_ip}'):
         cluster_data = build_cluster_data(req_ip,service)
 
     return render_template('clusters.html', data=cluster_data)
@@ -353,7 +354,8 @@ def hathi_db_exists():
     """
     Returns JSON with true/false indicating if the HathiTrust database exists
     """
-    db_path = 'data/hathi/hathitrust.db'
+    hathi_dir = get_hathi_data_dir()
+    db_path = hathi_dir / 'hathitrust.db'
     exists = os.path.exists(db_path)
     return jsonify({"exists": exists})
 
@@ -363,21 +365,21 @@ def build_hathi_db():
     """
     Starts the HathiTrust database building process in the background
     """
-    import subprocess
     import threading
-    
+    from lib.strategies_hathitrust_build_db import main as build_db_main
+
     def run_build():
         try:
-            # Run the build script
-            subprocess.run(['python3', 'lib/strategies_hathitrust_build_db.py'], check=True)
+            # Run the build function directly
+            build_db_main()
         except Exception as e:
             print(f"Error building database: {e}")
-    
+
     # Start the build process in a background thread
     thread = threading.Thread(target=run_build)
     thread.daemon = True
     thread.start()
-    
+
     return jsonify({"status": "started", "message": "Database build process started"})
 
 
@@ -386,7 +388,8 @@ def hathi_build_status():
     """
     Returns the current status of the HathiTrust database building process
     """
-    status_file = 'data/hathi/build_status.json'
+    hathi_dir = get_hathi_data_dir()
+    status_file = hathi_dir / 'build_status.json'
     
     if os.path.exists(status_file):
         try:
@@ -397,7 +400,7 @@ def hathi_build_status():
             return jsonify({"status": "unknown", "message": "Could not read status file"})
     else:
         # Check if database exists (build might be complete)
-        db_path = 'data/hathi/hathitrust.db'
+        db_path = hathi_dir / 'hathitrust.db'
         if os.path.exists(db_path):
             return jsonify({"status": "complete", "message": "Database exists"})
         else:
@@ -449,8 +452,8 @@ def view_preview():
     if 'id.loc.gov' in passed_id:
 
         passed_id_escaped = passed_id.replace(":",'_').replace("/",'_')
-        if os.path.isfile(f'data/cache/id.loc.gov_{passed_id_escaped}'):
-            data = json.load(open(f'data/cache/id.loc.gov_{passed_id_escaped}'))
+        if os.path.isfile(f'{CACHE_DIR}/id.loc.gov_{passed_id_escaped}'):
+            data = json.load(open(f'{CACHE_DIR}/id.loc.gov_{passed_id_escaped}'))
 
             print(data, flush=True  )
             too_add = '<ul>'
@@ -507,8 +510,8 @@ def view_preview():
     if 'viaf.org' in passed_id:
 
         passed_id_escaped = passed_id.replace(":",'_').replace("/",'_')
-        if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-            data = json.load(open(f'data/cache/{passed_id_escaped}'))
+        if os.path.isfile(f'{CACHE_DIR}/{passed_id_escaped}'):
+            data = json.load(open(f'{CACHE_DIR}/{passed_id_escaped}'))
 
             name_type = ""
             names = []
@@ -578,9 +581,9 @@ def view_preview():
 
         id = passed_id.split('/')[-1]
 
-        print("----",f'data/cache/oclc_{id}',flush=True)
-        if os.path.isfile(f'data/cache/oclc_{id}'):
-            data = json.load(open(f'data/cache/oclc_{id}'))
+        print("----",f'{CACHE_DIR}/oclc_{id}',flush=True)
+        if os.path.isfile(f'{CACHE_DIR}/oclc_{id}'):
+            data = json.load(open(f'{CACHE_DIR}/oclc_{id}'))
 
             too_add = "<ul>"
             
@@ -670,8 +673,8 @@ def view_preview():
 
         passed_id_escaped = passed_id.split('/')[-1]
 
-        if os.path.isfile(f'data/cache/cluster_id_{passed_id_escaped}'):
-            data = json.load(open(f'data/cache/cluster_id_{passed_id_escaped}'))
+        if os.path.isfile(f'{CACHE_DIR}/cluster_id_{passed_id_escaped}'):
+            data = json.load(open(f'{CACHE_DIR}/cluster_id_{passed_id_escaped}'))
 
 
 
@@ -699,8 +702,8 @@ def view_preview():
 
         passed_id_escaped = passed_id.split('/')[-1]
 
-        if os.path.isfile(f'data/cache/cluster_hathi_{passed_id_escaped}'):
-            data = json.load(open(f'data/cache/cluster_hathi_{passed_id_escaped}'))
+        if os.path.isfile(f'{CACHE_DIR}/cluster_hathi_{passed_id_escaped}'):
+            data = json.load(open(f'{CACHE_DIR}/cluster_hathi_{passed_id_escaped}'))
 
 
 
@@ -727,8 +730,8 @@ def view_preview():
 
         passed_id_escaped = passed_id.split('/')[-1]
 
-        if os.path.isfile(f'data/cache/cluster_google_books_{passed_id_escaped}'):
-            data = json.load(open(f'data/cache/cluster_google_books_{passed_id_escaped}'))
+        if os.path.isfile(f'{CACHE_DIR}/cluster_google_books_{passed_id_escaped}'):
+            data = json.load(open(f'{CACHE_DIR}/cluster_google_books_{passed_id_escaped}'))
 
 
 
@@ -761,8 +764,8 @@ def view_preview():
 
         passed_id_escaped = passed_id.split('/')[-1]
 
-        if os.path.isfile(f'data/cache/cluster_oclc_{passed_id_escaped}'):
-            data = json.load(open(f'data/cache/cluster_oclc_{passed_id_escaped}'))
+        if os.path.isfile(f'{CACHE_DIR}/cluster_oclc_{passed_id_escaped}'):
+            data = json.load(open(f'{CACHE_DIR}/cluster_oclc_{passed_id_escaped}'))
 
 
 
@@ -877,7 +880,7 @@ def save_cluster():
             return jsonify({"error": "Missing 'cluster_id' field"}), 400
         
         # Ensure cache directory exists
-        cache_dir = pathlib.Path('data/cache')
+        cache_dir = pathlib.Path(f'{CACHE_DIR}')
         cache_dir.mkdir(parents=True, exist_ok=True)
         
         # Save data to file (no .json extension, matching existing pattern)
@@ -987,13 +990,13 @@ import shutil
 
 # setup the cache directory
 # try:
-#     shutil.rmtree('data/cache')
+#     shutil.rmtree(f'{CACHE_DIR}')
 # except:
 #     print('error rm')
 #     pass
 
 try:
-    pathlib.Path("data/cache/").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(CACHE_DIR).mkdir(parents=True, exist_ok=True)
 except:
     print('error create')
     pass
@@ -1004,8 +1007,12 @@ if __name__ == '__main__':
     import subprocess
     import socket
 
-    # First, just open the browser
-    webbrowser.open('http://127.0.0.1:5001/')
+    # Check if running inside Electron (Electron sets this env var in main.js)
+    running_in_electron = os.environ.get('ELECTRON_RUN_AS_NODE') is not None or os.environ.get('RUNNING_IN_ELECTRON') == 'true'
+
+    # Only open browser if NOT running in Electron (Electron handles the UI)
+    if not running_in_electron:
+        webbrowser.open('http://127.0.0.1:5001/')
 
     # Check if port is already in use
     def is_port_in_use(port):
@@ -1014,30 +1021,33 @@ if __name__ == '__main__':
 
     if is_port_in_use(5001):
         # Port already in use, just show notification and exit
-        try:
-            subprocess.run([
-                'osascript', '-e',
-                'display notification "BookReconciler is already running at http://127.0.0.1:5001" with title "BookReconciler"'
-            ])
-        except:
-            pass
+        if not running_in_electron:
+            try:
+                subprocess.run([
+                    'osascript', '-e',
+                    'display notification "BookReconciler is already running at http://127.0.0.1:5001" with title "BookReconciler"'
+                ])
+            except:
+                pass
         print("BookReconciler is already running at http://127.0.0.1:5001")
     else:
         # Start the server
         def show_notification():
-            try:
-                subprocess.run([
-                    'osascript', '-e',
-                    'display notification "BookReconciler is running at http://127.0.0.1:5001" with title "BookReconciler Started"'
-                ])
-            except:
-                pass
+            if not running_in_electron:
+                try:
+                    subprocess.run([
+                        'osascript', '-e',
+                        'display notification "BookReconciler is running at http://127.0.0.1:5001" with title "BookReconciler Started"'
+                    ])
+                except:
+                    pass
 
         timer = threading.Timer(1.5, show_notification)
         timer.daemon = True
         timer.start()
 
         print("BookReconciler is running at http://127.0.0.1:5001")
-        print("Press Ctrl+C to stop the server")
+        if not running_in_electron:
+            print("Press Ctrl+C to stop the server")
         app.run(host='0.0.0.0', port=5001, debug=False)
 

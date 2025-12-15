@@ -9,12 +9,19 @@ from typing import Dict, Any, List
 
 
 from .strategies_helpers import _build_recon_dict
+from .paths import CACHE_DIR
 from .strategies_helpers import _build_recon_dict_name
+from .paths import CACHE_DIR
 from .strategies_helpers import normalize_string
+from .paths import CACHE_DIR
 from .strategies_helpers import has_numbers
+from .paths import CACHE_DIR
 from .strategies_helpers import wikidata_return_birth_year_from_viaf_uri
+from .paths import CACHE_DIR
 from .strategies_helpers import lc_return_birth_year_from_viaf_uri
+from .paths import CACHE_DIR
 from .strategies_helpers import remove_subtitle
+from .paths import CACHE_DIR
 
 
 
@@ -238,7 +245,7 @@ def _parse_name_results(result,reconcile_item):
 
 		## put it in the cache for later if we need to generate a preview flyout for it
 		file_name = uri.replace(':','_').replace('/','_')
-		with open(f'data/cache/{file_name}','w') as out:
+		with open(f'{CACHE_DIR}/{file_name}','w') as out:
 			json.dump(a_hit,out)
 
 
@@ -327,8 +334,8 @@ def extend_data(ids,properties, passed_config):
 				print("Checking cache for",i,flush=True)
 				# load it from the cache
 				passed_id_escaped = i.replace(":",'_').replace("/",'_')
-				if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-					data = json.load(open(f'data/cache/{passed_id_escaped}'))
+				if os.path.isfile(f'{CACHE_DIR}/{passed_id_escaped}'):
+					data = json.load(open(f'{CACHE_DIR}/{passed_id_escaped}'))
 					print("data",data,flush=True)
 					allQids = re.findall(r"WKP\|Q[0-9]{2,}", json.dumps(data))
 

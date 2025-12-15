@@ -71,3 +71,12 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Update release notes
+        if: runner.os != 'Windows'  # Only run once
+        run: |
+          VERSION=$(node -p "require('./electron/package.json').version")
+          sed "s/VERSION/$VERSION/g" .github/release-template.md > release-notes.md
+          gh release edit "v$VERSION" --notes-file release-notes.md || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

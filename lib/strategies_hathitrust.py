@@ -14,6 +14,7 @@ from .strategies_helpers import _build_recon_dict
 from .strategies_helpers import normalize_string
 from .strategies_helpers import has_numbers
 from .strategies_helpers import remove_subtitle
+from .paths import CACHE_DIR, get_hathi_data_dir
 
 
 config = {
@@ -220,10 +221,10 @@ def _cluster_works(records,reconcile_item,req_ip):
 		'title': reconcile_item['title'],
 		'author': author,
 	}
-	with open(f'data/cache/cluster_hathi_{use_id}','w') as out:
+	with open(f'{CACHE_DIR}/cluster_hathi_{use_id}','w') as out:
 		json.dump(all_clusters,out)
 
-	with open(f'data/cache/cluster_cache_hathi_{req_ip}','a') as out:
+	with open(f'{CACHE_DIR}/cluster_cache_hathi_{req_ip}','a') as out:
 		out.write(f'cluster_hathi_{use_id}\n')
 
 	result['or_query_response'].append({
@@ -249,7 +250,8 @@ def _search_local_hathi_db(title, author, test_mode=False):
 	full records from the 'records' table using the rowid.
 	"""
 
-	db_path = "data/hathi/hathitrust.db" if not test_mode else "data/hathi/hathitrust_test.db"
+	hathi_dir = get_hathi_data_dir()
+	db_path = hathi_dir / ("hathitrust.db" if not test_mode else "hathitrust_test.db")
 
 	conn = None
 	results = []
@@ -420,7 +422,7 @@ def _parse_results(data,reconcile_item):
 		print('-------')
 
 
-		with open(f"data/cache/hathi_{a_hit['ht_bib_key']}",'w') as out:
+		with open(f"{CACHE_DIR}/hathi_{a_hit['ht_bib_key']}",'w') as out:
 			json.dump(a_hit,out)
 
 		result['or_query_response'].append(
@@ -539,7 +541,7 @@ def extend_data(ids,properties,passed_config):
 
 			uuid_val = i.split('/')[-1]
 
-			filename = f'data/cache/cluster_hathi_{uuid_val}'
+			filename = f'{CACHE_DIR}/cluster_hathi_{uuid_val}'
 			if os.path.isfile(filename):
 				data = json.load(open(filename))
 
@@ -619,8 +621,8 @@ def extend_data(ids,properties,passed_config):
 
 			hathi_id = i.split("/")[-1]
 			data = None
-			if os.path.isfile(f'data/cache/hathi_{hathi_id}'):
-				data = json.load(open(f'data/cache/hathi_{hathi_id}'))
+			if os.path.isfile(f'{CACHE_DIR}/hathi_{hathi_id}'):
+				data = json.load(open(f'{CACHE_DIR}/hathi_{hathi_id}'))
 
 				rec_data = extract_info(data)
 				for p in properties:

@@ -21,6 +21,7 @@ a = Analysis(
         'xml.etree.ElementTree',
         'xml.etree',
         'xml',
+        'lib.paths',
     ],
     hookspath=[],
     hooksconfig={},

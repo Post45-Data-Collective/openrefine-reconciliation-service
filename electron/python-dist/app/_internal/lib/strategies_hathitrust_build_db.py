@@ -9,6 +9,7 @@ import time
 import pickle
 import tempfile
 import shutil
+from lib.paths import get_hathi_data_dir
 
 # all records: Processed 9400000 records. 18833795 lines read.
 # BK only: Processed 8710000 records. 12351232 lines read.
@@ -97,10 +98,10 @@ def update_status(status, message, progress=None, total=None):
         status_data["progress"] = progress
     if total is not None:
         status_data["total"] = total
-    
-    status_file = "data/hathi/build_status.json"
-    os.makedirs(os.path.dirname(status_file), exist_ok=True)
-    
+
+    status_file = get_hathi_data_dir() / "build_status.json"
+    status_file.parent.mkdir(parents=True, exist_ok=True)
+
     with open(status_file, 'w') as f:
         json.dump(status_data, f)
 
@@ -112,18 +113,19 @@ def build_db(gzipped_file_path):
     Records are batched to disk to avoid memory issues.
     """
     update_status("preparing", f"Building database from {gzipped_file_path}")
-    
+
     # Create temp directory for batch files
-    temp_dir = tempfile.mkdtemp(prefix="hathi_batch_", dir="data/hathi")
+    hathi_dir = get_hathi_data_dir()
+    temp_dir = tempfile.mkdtemp(prefix="hathi_batch_", dir=str(hathi_dir))
     print(f"Created temp directory for batches: {temp_dir}")
     batch_files = []
 
 
 
-    db_path = "data/hathi/hathitrust.db"
-    
+    db_path = hathi_dir / "hathitrust.db"
+
     # Create directory if it doesn't exist
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    db_path.parent.mkdir(parents=True, exist_ok=True)
 
     if os.path.exists(db_path):
         os.remove(db_path)
@@ -410,10 +412,11 @@ def build_db(gzipped_file_path):
 
 def download_file(url):
     """Download file from URL with progress tracking"""
-    local_filename = os.path.join('data/hathi', url.split('/')[-1])
-    
+    hathi_dir = get_hathi_data_dir()
+    local_filename = hathi_dir / url.split('/')[-1]
+
     # Create directory if it doesn't exist
-    os.makedirs(os.path.dirname(local_filename), exist_ok=True)
+    hathi_dir.mkdir(parents=True, exist_ok=True)
     
     print(f"Starting download of {url}")
     update_status("downloading", f"Downloading {url.split('/')[-1]}...")
@@ -508,9 +511,10 @@ def find_dump_url():
 def main():
     """Main function that orchestrates the entire database build process"""
     update_status("starting", "Initializing HathiTrust database build process...")
-    
+
     # Clean up any existing database before starting
-    db_path = "data/hathi/hathitrust.db"
+    hathi_dir = get_hathi_data_dir()
+    db_path = hathi_dir / "hathitrust.db"
     try:
         if os.path.exists(db_path):
             os.remove(db_path)

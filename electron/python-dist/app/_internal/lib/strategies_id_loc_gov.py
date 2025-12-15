@@ -9,9 +9,13 @@ import os
 from thefuzz import fuzz
 
 from .strategies_helpers import _build_recon_dict
+from .paths import CACHE_DIR
 from .strategies_helpers import normalize_string
+from .paths import CACHE_DIR
 from .strategies_helpers import has_numbers
+from .paths import CACHE_DIR
 from .strategies_helpers import remove_subtitle
+from .paths import CACHE_DIR
 
 
 
@@ -519,7 +523,7 @@ def _parse_single_results(data, reconcile_item):
 		
 
 		file_name = hit['uri'].replace(':','_').replace('/','_')
-		with open(f"data/cache/id.loc.gov_{file_name}",'w') as out:
+		with open(f"{CACHE_DIR}/id.loc.gov_{file_name}",'w') as out:
 			json.dump(hit,out)
 
 		# Create the OpenRefine response item
@@ -577,10 +581,10 @@ def _cluster_works(records,reconcile_item,req_ip):
 		'title': reconcile_item['title'],
 		'author': reconcile_item['author_name'],
 	}
-	with open(f'data/cache/cluster_id_{use_id}','w') as out:
+	with open(f'{CACHE_DIR}/cluster_id_{use_id}','w') as out:
 		json.dump(all_clusters,out)
 
-	with open(f'data/cache/cluster_cache_id_{req_ip}','a') as out:
+	with open(f'{CACHE_DIR}/cluster_cache_id_{req_ip}','a') as out:
 		out.write(f'cluster_id_{use_id}\n')
 
 	result['or_query_response'].append({
@@ -758,7 +762,7 @@ def extend_data(ids,properties,passed_config):
 
 			uuid_val = i.split('/')[-1]
 
-			filename = f'data/cache/cluster_id_{uuid_val}'
+			filename = f'{CACHE_DIR}/cluster_id_{uuid_val}'
 			if os.path.isfile(filename):
 				data = json.load(open(filename))
 				print(data,flush=True)

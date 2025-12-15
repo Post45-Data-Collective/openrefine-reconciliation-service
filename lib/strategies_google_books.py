@@ -9,9 +9,13 @@ from thefuzz import fuzz
 
 
 from .strategies_helpers import _build_recon_dict
+from .paths import CACHE_DIR
 from .strategies_helpers import normalize_string
+from .paths import CACHE_DIR
 from .strategies_helpers import has_numbers
+from .paths import CACHE_DIR
 from .strategies_helpers import remove_subtitle
+from .paths import CACHE_DIR
 
 
 ID_HEADERS = {
@@ -442,7 +446,7 @@ def _parse_single_results(data, reconcile_item):
 		# Cache the item
 		uri = 'https://www.googleapis.com/books/v1/volumes/' + item['id']
 		file_name = uri.replace(':','_').replace('/','_')
-		with open(f'data/cache/google_books_{file_name}','w') as out:
+		with open(f'{CACHE_DIR}/google_books_{file_name}','w') as out:
 			json.dump(item, out)
 		
 		# Create the OpenRefine response item
@@ -511,10 +515,10 @@ def _cluster_works(records, reconcile_item, req_ip):
 		'title': reconcile_item['title'],
 		'author': reconcile_item['author_name'],
 	}
-	with open(f'data/cache/cluster_google_books_{use_id}','w') as out:
+	with open(f'{CACHE_DIR}/cluster_google_books_{use_id}','w') as out:
 		json.dump(all_clusters, out)
 	
-	with open(f'data/cache/cluster_cache_google_books_{req_ip}','a') as out:
+	with open(f'{CACHE_DIR}/cluster_cache_google_books_{req_ip}','a') as out:
 		out.write(f'cluster_google_books_{use_id}\n')
 	
 	result['or_query_response'].append({
@@ -594,8 +598,8 @@ def extend_data(ids, properties, passed_config):
 				if p['id'] == 'ISBN':
 					# load it from the cache
 					passed_id_escaped = i.replace(":",'_').replace("/",'_')
-					if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-						data = json.load(open(f'data/cache/{passed_id_escaped}'))
+					if os.path.isfile(f'{CACHE_DIR}/{passed_id_escaped}'):
+						data = json.load(open(f'{CACHE_DIR}/{passed_id_escaped}'))
 					
 					isbns = []
 
@@ -624,8 +628,8 @@ def extend_data(ids, properties, passed_config):
 				elif p['id'] == 'description':
 					# load it from the cache
 					passed_id_escaped = i.replace(":",'_').replace("/",'_')
-					if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-						data = json.load(open(f'data/cache/{passed_id_escaped}'))
+					if os.path.isfile(f'{CACHE_DIR}/{passed_id_escaped}'):
+						data = json.load(open(f'{CACHE_DIR}/{passed_id_escaped}'))
 					
 					description = ""
 
@@ -644,8 +648,8 @@ def extend_data(ids, properties, passed_config):
 				elif p['id'] == 'pageCount':
 					# load it from the cache
 					passed_id_escaped = i.replace(":",'_').replace("/",'_')
-					if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-						data = json.load(open(f'data/cache/{passed_id_escaped}'))
+					if os.path.isfile(f'{CACHE_DIR}/{passed_id_escaped}'):
+						data = json.load(open(f'{CACHE_DIR}/{passed_id_escaped}'))
 					
 					pageCount = None
 
@@ -663,8 +667,8 @@ def extend_data(ids, properties, passed_config):
 				elif p['id'] == 'language':
 					# load it from the cache
 					passed_id_escaped = i.replace(":",'_').replace("/",'_')
-					if os.path.isfile(f'data/cache/{passed_id_escaped}'):
-						data = json.load(open(f'data/cache/{passed_id_escaped}'))
+					if os.path.isfile(f'{CACHE_DIR}/{passed_id_escaped}'):
+						data = json.load(open(f'{CACHE_DIR}/{passed_id_escaped}'))
 					
 					language = None
 
@@ -687,7 +691,7 @@ def extend_data(ids, properties, passed_config):
 		elif 'cluster/google_books' in i:
 			# Cluster of volumes
 			uuid_val = i.split('/')[-1]
-			filename = f'data/cache/cluster_google_books_{uuid_val}'
+			filename = f'{CACHE_DIR}/cluster_google_books_{uuid_val}'
 			if os.path.isfile(filename):
 				data = json.load(open(filename))
 				print(data, flush=True)

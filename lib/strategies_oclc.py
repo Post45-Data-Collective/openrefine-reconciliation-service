@@ -6,6 +6,7 @@ import glob
 import uuid
 from thefuzz import fuzz
 from .strategies_helpers import _build_recon_dict, normalize_string, has_numbers, remove_subtitle
+from .paths import CACHE_DIR
 
 
 extend_work_mapping = {}
@@ -360,10 +361,10 @@ def _cluster_works(data, reconcile_item, req_ip):
 
 	use_uri = config['APP_BASE'] + 'cluster/oclc/' + use_id
 	
-	with open(f'data/cache/cluster_oclc_{use_id}','w') as out:
+	with open(f'{CACHE_DIR}/cluster_oclc_{use_id}','w') as out:
 		json.dump(all_clusters, out)
 	
-	with open(f'data/cache/cluster_cache_oclc_{req_ip}','a') as out:
+	with open(f'{CACHE_DIR}/cluster_cache_oclc_{req_ip}','a') as out:
 		out.write(f'cluster_oclc_{use_id}\n')
 	
 	# Count work clusters for display
@@ -422,7 +423,7 @@ def _parse_single_results(data, reconcile_item):
 		# Cache the item
 		oclc_number = item.get('oclcNumber', str(uuid.uuid4()))
 		file_name = f"oclc_{oclc_number}".replace(':','_').replace('/','_')
-		with open(f'data/cache/{file_name}','w') as out:
+		with open(f'{CACHE_DIR}/{file_name}','w') as out:
 			json.dump(item, out)
 		
 		# Create the OpenRefine response item
@@ -502,7 +503,7 @@ def extend_data(ids, properties, passed_config):
 		if '/oclc/' in i and 'cluster/oclc' not in i:
 			# Single OCLC record
 			oclc_number = i.split('/')[-1]
-			cache_file = f'data/cache/oclc_{oclc_number}'
+			cache_file = f'{CACHE_DIR}/oclc_{oclc_number}'
 			
 			if os.path.isfile(cache_file):
 				data = json.load(open(cache_file))
@@ -554,7 +555,7 @@ def extend_data(ids, properties, passed_config):
 
 			# Cluster of OCLC records
 			uuid_val = i.split('/')[-1]
-			filename = f'data/cache/cluster_oclc_{uuid_val}'
+			filename = f'{CACHE_DIR}/cluster_oclc_{uuid_val}'
 			print("filename",filename,flush=True)
 			if os.path.isfile(filename):
 				data = json.load(open(filename))
