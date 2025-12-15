@@ -54,9 +54,22 @@ jobs:
         working-directory: electron
         run: npm install
 
-      - name: Build Python app with PyInstaller
+      - name: Build Python app with PyInstaller (macOS - force x64)
+        if: runner.os != 'Windows'
+        working-directory: electron
+        run: pyinstaller app-electron.spec --distpath python-dist --clean --target-arch x86_64
+
+      - name: Build Python app with PyInstaller (Windows)
+        if: runner.os == 'Windows'
         working-directory: electron
         run: pyinstaller app-electron.spec --distpath python-dist --clean
+
+      - name: Generate release notes
+        if: runner.os != 'Windows'  # Only run once
+        run: |
+          VERSION=$(node -p "require('./electron/package.json').version")
+          sed "s/VERSION/$VERSION/g" .github/release-template.md > release-notes.md
+          cat release-notes.md
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
@@ -77,6 +90,6 @@ jobs:
         run: |
           VERSION=$(node -p "require('./electron/package.json').version")
           sed "s/VERSION/$VERSION/g" .github/release-template.md > release-notes.md
-          gh release edit "v$VERSION" --notes-file release-notes.md || true
+          gh release edit "v$VERSION" --notes-file release-notes.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

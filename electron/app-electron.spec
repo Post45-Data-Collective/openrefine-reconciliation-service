@@ -61,7 +61,6 @@ exe = EXE(
     console=False,  # No console window
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch=None,  # Build for native architecture (x64 on macos-13 runner)
     codesign_identity=None,
     entitlements_file=None,
 )

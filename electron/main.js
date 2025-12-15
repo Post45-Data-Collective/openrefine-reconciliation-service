@@ -74,6 +74,8 @@ function startFlaskServer() {
 
     flaskProcess = serverProcess;
 
+    let errorOutput = '';
+
     serverProcess.stdout.on('data', (data) => {
       console.log(`Flask: ${data}`);
       // Look for Flask startup message
@@ -83,16 +85,22 @@ function startFlaskServer() {
     });
 
     serverProcess.stderr.on('data', (data) => {
-      console.error(`Flask Error: ${data}`);
+      const errorText = data.toString();
+      console.error(`Flask Error: ${errorText}`);
+      errorOutput += errorText;
     });
 
     serverProcess.on('error', (error) => {
       console.error(`Failed to start Flask: ${error}`);
+      errorOutput += `\nProcess error: ${error}`;
       reject(error);
     });
 
     serverProcess.on('close', (code) => {
       console.log(`Flask process exited with code ${code}`);
+      if (code !== 0 && errorOutput) {
+        global.flaskStartupError = errorOutput;
+      }
     });
 
     // If we don't get a startup message within 10 seconds, assume it's ready
@@ -155,7 +163,10 @@ app.whenReady().then(async () => {
     const serverReady = await waitForServer();
 
     if (!serverReady) {
-      dialog.showErrorBox('Server Error', 'Failed to start BookReconciler server. Please try again.');
+      const errorDetails = global.flaskStartupError
+        ? `\n\nError details:\n${global.flaskStartupError.substring(0, 500)}`
+        : '\n\nNo error details available. Try running from Terminal to see logs.';
+      dialog.showErrorBox('Server Error', `Failed to start BookReconciler server. Please try again.${errorDetails}`);
       app.quit();
       return;
     }
