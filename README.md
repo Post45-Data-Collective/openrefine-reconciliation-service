@@ -11,20 +11,24 @@
 
 **BookReconciler 📘💎** is a tool that helps you reconcile and enrich bibliographic data from multiple library and knowledge sources:
 
-1. **id.loc.gov** (Library of Congress)
+1. **Library of Congress**
 2. **Google Books**
 3. **OCLC / WorldCat**
 4. **HathiTrust**
-5. **VIAF** (Personal names and Works/Titles)
-6. **Wikidata** (Works/Titles)
+5. **VIAF**
+6. **Wikidata**
 
 You can take a spreadsheet with only title and author information, and you can add identifiers like **ISBNs**, **OCLC numbers**, or **HathiTrust Volume IDs**, as well as valuable contextual information like Library of Congress **Subject Headings**, **genres**, **descriptions**, **page counts**, and **dates of first publicatio**n. Additionally, you can find and cluster different editions or manifestations of the same _Work_ (e.g., translations, reprints, etc.).
+
+![](images/bookreconociler-logo-ps-white.png)
 
 The tool currently works as an extension of the software application **[OpenRefine](https://openrefine.org/)**, which makes it accessible to those with and without computational experience. It includes a user-friendly, human-in-the-loop interface for manually evaluating matches, defining _Works_ (e.g., whether to include translations or not), and configuring the behavior of the service (e.g., matching all possible editions or just the best one).
 
 The tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis.
 
 Watch a YouTube demo/tutorial video here: https://youtu.be/V9ZJoFowRJM
+
+# Instllation
 
 ## 1. Install OpenRefine
 
@@ -43,16 +47,16 @@ BookReconciler 📘💎 is designed to work with **OpenRefine**, an open-source 
 Choose the installation method that works best for your system:
 
 <details open>
-<summary><b>Option 1: <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> Mac or <img src="https://img.shields.io/badge/-Windows-0078D4?logo=windows&logoColor=white" height="20"/> Windows - Desktop App (Recommended)</b></summary>
+<summary><b>Option 1: Desktop App (Recommended)</b></summary>
 
 <br>
 
-**No installation required!** Download and run the standalone desktop app:
+Download and run the standalone desktop app.
 
 #### <img src="https://img.shields.io/badge/-MacOS-000000?logo=apple&logoColor=white" height="20"/> macOS (Intel or Apple Silicon):
 
-1. **[Download the latest macOS app](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/latest)** (`.dmg` or `.zip`)
-2. Open the `.dmg` file and drag **BookReconciler.app** to your Applications folder (or unzip and double-click the `.app`)
+1. **[Download the latest macOS app](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/releases/latest)**
+2. Open the `.dmg` file and drag **BookReconciler.app** to your Applications folder
 3. Launch **BookReconciler** — your browser will automatically open to <http://127.0.0.1:5001/>
 
 **Note:** On first launch, macOS may show a security warning. Right-click the app and select **Open** → **Open** to bypass.
@@ -173,7 +177,7 @@ When it starts, the service will be available at:
 
 ---
 
-## 3. Use BookReconciler in OpenRefine
+# Usage
 
 1. Open your dataset/project in OpenRefine.
 2. Click a column you want to reconcile—for example, the book "title" column.
@@ -202,7 +206,7 @@ When it starts, the service will be available at:
 
 ---
 
-## Customize BookReconciler Behavior
+# Customization
 
 Open <http://127.0.0.1:5001/> to adjust how BookReconciler matches, clusters, and writes back data. No code editing required.
 
