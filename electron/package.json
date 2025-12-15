@@ -1,6 +1,6 @@
 {
   "name": "bookreconciler",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "BookReconciler - Metadata Enrichment and Work-Level Clustering",
   "main": "main.js",
   "repository": {
