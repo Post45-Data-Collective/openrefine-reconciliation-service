@@ -35,8 +35,8 @@ jobs:
       - name: Download standalone Python (Intel)
         if: matrix.os == 'macos-15-intel'
         run: |
-          curl -LO https://github.com/indygreg/python-build-standalone/releases/download/20241016/cpython-3.9.20%2B20241016-x86_64-apple-darwin-install_only.tar.gz
-          tar -xzf cpython-3.9.20+20241016-x86_64-apple-darwin-install_only.tar.gz
+          curl -L -o python-standalone.tar.gz https://github.com/indygreg/python-build-standalone/releases/download/20241016/cpython-3.9.20%2B20241016-x86_64-apple-darwin-install_only.tar.gz
+          tar -xzf python-standalone.tar.gz
           echo "STANDALONE_PYTHON=$PWD/python/bin/python3" >> $GITHUB_ENV
 
       - name: Install Python dependencies (Intel with standalone)
