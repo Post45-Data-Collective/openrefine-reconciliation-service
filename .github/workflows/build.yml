@@ -26,12 +26,28 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set up Python (non-Intel)
+        if: matrix.os != 'macos-15-intel'
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.os == 'macos-15-intel' && '3.8' || '3.9' }}
+          python-version: '3.9'
 
-      - name: Install Python dependencies
+      - name: Download standalone Python (Intel)
+        if: matrix.os == 'macos-15-intel'
+        run: |
+          curl -LO https://github.com/indygreg/python-build-standalone/releases/download/20241016/cpython-3.9.20%2B20241016-x86_64-apple-darwin-install_only.tar.gz
+          tar -xzf cpython-3.9.20+20241016-x86_64-apple-darwin-install_only.tar.gz
+          echo "STANDALONE_PYTHON=$PWD/python/bin/python3" >> $GITHUB_ENV
+
+      - name: Install Python dependencies (Intel with standalone)
+        if: matrix.os == 'macos-15-intel'
+        run: |
+          $STANDALONE_PYTHON -m pip install --upgrade pip
+          $STANDALONE_PYTHON -m pip install -r requirements.txt
+          $STANDALONE_PYTHON -m pip install pyinstaller
+
+      - name: Install Python dependencies (non-Intel)
+        if: matrix.os != 'macos-15-intel'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -60,11 +76,16 @@ jobs:
         working-directory: electron
         run: npm install
 
-      - name: Build Python app with PyInstaller (macOS)
-        if: runner.os != 'Windows'
+      - name: Build Python app with PyInstaller (Intel with standalone)
+        if: matrix.os == 'macos-15-intel'
         working-directory: electron
         env:
           MACOSX_DEPLOYMENT_TARGET: '10.13'
+        run: $STANDALONE_PYTHON -m PyInstaller app-electron.spec --distpath python-dist --clean
+
+      - name: Build Python app with PyInstaller (macOS ARM)
+        if: matrix.os == 'macos-14'
+        working-directory: electron
         run: pyinstaller app-electron.spec --distpath python-dist --clean
 
       - name: Build Python app with PyInstaller (Windows)
