@@ -29,7 +29,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: ${{ matrix.os == 'macos-15-intel' && '3.8' || '3.9' }}
 
       - name: Install Python dependencies
         run: |
@@ -63,6 +63,8 @@ jobs:
       - name: Build Python app with PyInstaller (macOS)
         if: runner.os != 'Windows'
         working-directory: electron
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '10.13'
         run: pyinstaller app-electron.spec --distpath python-dist --clean
 
       - name: Build Python app with PyInstaller (Windows)
