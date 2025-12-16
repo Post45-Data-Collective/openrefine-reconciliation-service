@@ -9,23 +9,6 @@
 - [Customization](#customization)
 - [Credit & Citation](#credit--citation)
 
-[BookReconciler📘💎: An Open-Source Tool for Metadata Enrichment and Work-Level Clustering](https://arxiv.org/abs/2512.10165).
-Matt Miller, Dan Sinykin, and Melanie Walsh.
-_Joint Conference on Digital Libraries_, Resources Track.
-
-BibTeX Citation:
-
-```
-@inproceedings{miller-2025-bookreconciler,
-  title = {BookReconciler📘💎: An Open-Source Tool for Metadata Enrichment and Work-Level Clustering},
-  author = {Miller, Matt and Sinykin, Dan and Walsh, Melanie},
-  booktitle = {Joint Conference on Digital Libraries},
-  month = dec,
-  year = {2025},
-  publisher = {ACM/IEEE},
-}
-```
-
 ---
 
 - **Who is this for?** Digital humanities researchers, librarians, metadata specialists, and more.
