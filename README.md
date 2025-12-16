@@ -2,6 +2,32 @@
 
 # BookReconciler 📘💎 — Metadata Enrichment and Work-Level Clustering
 
+---
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Customization](#customization)
+- [Credit & Citation](#credit--citation)
+
+[BookReconciler📘💎: An Open-Source Tool for Metadata Enrichment and Work-Level Clustering](https://arxiv.org/abs/2512.10165).
+Matt Miller, Dan Sinykin, and Melanie Walsh.
+_Joint Conference on Digital Libraries_, Resources Track.
+
+BibTeX Citation:
+
+```
+@inproceedings{miller-2025-bookreconciler,
+  title = {BookReconciler📘💎: An Open-Source Tool for Metadata Enrichment and Work-Level Clustering},
+  author = {Miller, Matt and Sinykin, Dan and Walsh, Melanie},
+  booktitle = {Joint Conference on Digital Libraries},
+  month = dec,
+  year = {2025},
+  publisher = {ACM/IEEE},
+}
+```
+
+---
+
 - **Who is this for?** Digital humanities researchers, librarians, metadata specialists, and more.
 - **What does it do?** Finds, clusters, and enriches records for books. Adding ISBNS, HathiTrust IDs, subject headings, descriptions, page counts, publication dates, and more.
 
@@ -24,11 +50,13 @@ You can take a spreadsheet with only title and author information, and you can a
 
 The tool currently works as an extension of the software application **[OpenRefine](https://openrefine.org/)**, which makes it accessible to those with and without computational experience. It includes a user-friendly, human-in-the-loop interface for manually evaluating matches, defining _Works_ (e.g., whether to include translations or not), and configuring the behavior of the service (e.g., matching all possible editions or just the best one).
 
-The tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis.
+The tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis. To learn more about accessing full text with Volume IDs, see the [HathiTrust Feature Reader](https://github.com/htrc/htrc-feature-reader?tab=readme-ov-file#usage) Python package.
 
-Watch a YouTube demo/tutorial video here: https://youtu.be/V9ZJoFowRJM
+Watch a YouTube demo/tutorial video of BookReconciler here: https://youtu.be/V9ZJoFowRJM
 
-# Instllation
+---
+
+# Installation
 
 ## 1. Install OpenRefine
 
@@ -111,8 +139,6 @@ docker compose up
 ```
 
 </details>
-
----
 
 <details>
 <summary><b>Option 4: Launch Your Own Server (Advanced)</b></summary>
@@ -252,16 +278,39 @@ If you plan to use OCLC’s protected endpoints, you can input your API keys on 
 
 ---
 
-## Contributing
+## Credit & Citation
 
-This project was inititally supported by an NEH grant that was cancelled in 2025. To grow and sustain this project, we welcome and encourage contributions from the broader community.
+This code is primarily written by Matt Miller, with contributions from Melanie Walsh. This project is supported by the [Post45 Data Collective](https://data.post45.org/), a repository for cultural data from 1945 to the present. The code is licensed under the **MIT License** (see [`LICENSE`](LICENSE) for details).
 
-Feel free to add pull requests or get in touch if you have ideas. Please also note any issues or problems.
+This project was initially supported by a grant from the National Endowment for the Humanities (NEH), ["Post45 Data Collective: Enhancing Cultural Data Documentation, Interoperability, and Reach,"](https://apps.neh.gov/publicquery/AwardDetail.aspx?gn=HAA-301046-24) and led by co-PIs Dan Sinykin and Melanie Walsh. The grant was slated to run from 2024-2026, but it was sadly and abruptly cancelled in spring 2025.
+
+If you use this tool, we'd love to hear from you! You can fill out [this Google Form](https://forms.gle/akbcCGiLvCaDcpWAA) or email us.
+
+If you use this tool as part of a publication, you can credit us by citing the following paper:
+
+[BookReconciler📘💎: An Open-Source Tool for Metadata Enrichment and Work-Level Clustering](https://arxiv.org/abs/2512.10165).
+Matt Miller, Dan Sinykin, and Melanie Walsh.
+_Joint Conference on Digital Libraries_, Resources Track.
+
+BibTeX Citation:
+
+```
+@inproceedings{miller-2025-bookreconciler,
+  title = {BookReconciler📘💎: An Open-Source Tool for Metadata Enrichment and Work-Level Clustering},
+  author = {Miller, Matt and Sinykin, Dan and Walsh, Melanie},
+  booktitle = {Joint Conference on Digital Libraries},
+  month = dec,
+  year = {2025},
+  publisher = {ACM/IEEE},
+}
+```
 
 ---
 
-## License
+## Contributing
 
-This project is licensed under the **MIT License**. See the [`LICENSE`](LICENSE) file for details.
+In the near term, maintenance of this tool will be supported by the Post45 Data Collective. However, to grow and sustain this project, we strongly welcome and encourage contributions from the broader community (or funding :D ).
+
+Feel free to add pull requests or get in touch if you have ideas. Please also note any issues or problems.
 
 ---
