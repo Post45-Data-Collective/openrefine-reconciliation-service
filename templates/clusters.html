@@ -279,7 +279,7 @@ input[type="range"]:focus::-moz-range-thumb{
                 <tbody>
                     <tr v-for="(item, index) in activeClusterDisplay" :key="getItemKey(item)" >
                         <td>
-                            <input v-model="item.included" :id="getItemKey(item)" class="check" type="checkbox" @change="saveCluster(); isSaved = false;">
+                            <input v-model="item.included" :id="getItemKey(item)" class="check" type="checkbox" @change="isSaved = false; saveCluster();">
                         </td>
                         
 

@@ -141,7 +141,7 @@
                     <tr v-for="(item, index) in dataDisplay" :key="getItemKey(item)" >
 
                         <td>
-                            <input v-model="item.included" :id="getItemKey(item)" class="check" type="checkbox">
+                            <input v-model="item.included" :id="getItemKey(item)" class="check" type="checkbox" @change="saveCluster()">
                         </td>
                         
 
