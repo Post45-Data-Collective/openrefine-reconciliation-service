@@ -11,6 +11,7 @@ from lib.strategies_oclc import process_oclc_query
 from lib.strategies_viaf import process_viaf_query, process_viaf_title_query
 from lib.strategies_hathitrust import process_hathi_query
 from lib.strategies_wikidata import process_wikidata_title_query
+from lib.strategies_openlibrary import process_openlibrary_title_query
 from lib.strategies_helpers import reset_cluster_cache, build_cluster_data
 
 
@@ -19,6 +20,8 @@ from lib.strategies_viaf import extend_data as extend_data_viaf
 from lib.strategies_oclc import extend_data as extend_data_worldcat
 from lib.strategies_google_books import extend_data as extend_data_google
 from lib.strategies_hathitrust import extend_data as extend_data_hathi
+from lib.strategies_openlibrary import extend_data as extend_data_openlibrary
+
 from lib.paths import get_hathi_data_dir, CACHE_DIR
 
 
@@ -290,7 +293,10 @@ def return_manifest():
                         return process_wikidata_title_query(query,current_app.config)
                         break
 
-
+                    if query[queryId]['type'] == 'OpenLibrary_Title':
+                        # print('**',query,flush=True)
+                        return process_openlibrary_title_query(query,current_app.config)
+                        break
 
 
 
@@ -322,6 +328,8 @@ def return_manifest():
                         return extend_data_google(extend_req['ids'],extend_req['properties'], current_app.config)
                     elif "hathitrust.org" in extend_req['ids'][0] or "cluster/hathi" in extend_req['ids'][0]:
                         return extend_data_hathi(extend_req['ids'],extend_req['properties'], current_app.config)
+                    elif "openlibrary.org" in extend_req['ids'][0]:
+                        return extend_data_openlibrary(extend_req['ids'],extend_req['properties'], current_app.config)
 
 
 
@@ -436,6 +444,8 @@ def view_redirect():
     if 'hathi' in passed_id:
         return redirect(passed_id, code=302)
     if 'wikidata.org' in passed_id:
+        return redirect(passed_id, code=302)
+    if 'openlibrary.org' in passed_id:
         return redirect(passed_id, code=302)
 
 
@@ -984,6 +994,90 @@ def set_config():
     except Exception as e:
         return jsonify({
             "error": f"Failed to update configuration: {str(e)}"
+        }), 500
+
+@app.route("/api/local/cache_info")
+def cache_info():
+    """
+    Returns information about the cache directory size and file count
+    """
+    try:
+        cache_path = pathlib.Path(CACHE_DIR)
+
+        if not cache_path.exists():
+            return jsonify({
+                "size_mb": 0,
+                "file_count": 0
+            }), 200
+
+        total_size = 0
+        file_count = 0
+
+        for file_path in cache_path.rglob('*'):
+            if file_path.is_file() and file_path.name != '.gitignore':
+                total_size += file_path.stat().st_size
+                file_count += 1
+
+        size_mb = total_size / (1024 * 1024)
+
+        return jsonify({
+            "size_mb": size_mb,
+            "file_count": file_count
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "error": f"Failed to get cache info: {str(e)}"
+        }), 500
+
+@app.route("/api/local/clear_cache", methods=['POST'])
+def clear_cache():
+    """
+    Clears all files in the cache directory
+    """
+    try:
+        cache_path = pathlib.Path(CACHE_DIR)
+
+        if not cache_path.exists():
+            return jsonify({
+                "message": "Cache directory does not exist",
+                "files_deleted": 0
+            }), 200
+
+        files_deleted = 0
+        errors = []
+
+        for file_path in cache_path.rglob('*'):
+            if file_path.is_file() and file_path.name != '.gitignore':
+                try:
+                    file_path.unlink()
+                    files_deleted += 1
+                except Exception as e:
+                    errors.append(f"{file_path.name}: {str(e)}")
+
+        # Also remove empty subdirectories
+        for dir_path in sorted(cache_path.rglob('*'), reverse=True):
+            if dir_path.is_dir():
+                try:
+                    dir_path.rmdir()
+                except OSError:
+                    pass  # Directory not empty, skip
+
+        if errors:
+            return jsonify({
+                "message": f"Cache partially cleared with {len(errors)} errors",
+                "files_deleted": files_deleted,
+                "errors": errors
+            }), 200
+
+        return jsonify({
+            "message": "Cache cleared successfully",
+            "files_deleted": files_deleted
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "error": f"Failed to clear cache: {str(e)}"
         }), 500
 
 import shutil

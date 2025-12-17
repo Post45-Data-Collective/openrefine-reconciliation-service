@@ -169,7 +169,91 @@ extend_values_HathiTrust = {
     {
       "id": "title",
       "name": "Most Common Title"
-    },    
+    },
+
+  ]
+}
+
+extend_values_OpenLibrary = {
+  "limit": 10,
+  "type": "OpenLibrary_Title",
+  "properties": [
+    {
+      "id": "description",
+      "name": "Description"
+    },
+    {
+      "id": "subjects",
+      "name": "Subjects"
+    },
+    {
+      "id": "subject_places",
+      "name": "Subject Places"
+    },
+    {
+      "id": "subject_people",
+      "name": "Subject People"
+    },
+    {
+      "id": "subject_times",
+      "name": "Subject Times"
+    },
+    {
+      "id": "first_publish_year",
+      "name": "First Publish Year"
+    },
+    {
+      "id": "covers",
+      "name": "Cover IDs"
+    },
+    {
+      "id": "edition_count",
+      "name": "Edition Count"
+    },
+    {
+      "id": "title",
+      "name": "Title"
+    },
+
+
+
+    {
+      "id": "isbn_13",
+      "name": "ISBN 13"
+    },
+    {
+      "id": "pagination",
+      "name": "Pagination"
+    },
+    {
+      "id": "publishers",
+      "name": "Publishers"
+    },
+    {
+      "id": "isbn_10",
+      "name": "ISBN 10"
+    },
+    {
+      "id": "oclc_numbers",
+      "name": "OCLC Numbers"
+    },
+    {
+      "id": "lc_classifications",
+      "name": "LCC Classifications"
+    },
+    {
+      "id": "dewey_decimal_class",
+      "name": "Dewey Decimal Class"
+    },
+    {
+      "id": "identifiers.amazon",
+      "name": "Amazon ID"
+    },
+    {
+      "id": "identifiers.better_world_books",
+      "name": "Better World Books ID"
+    },
+
 
   ]
 }
@@ -186,11 +270,13 @@ def suggest_extend(query):
         return extend_values_VIAF
     if query == 'VIAF_Title':
         return extend_values_VIAF_Title
-    
+
     if query == 'OCLC_Record':
         return extend_values_Worldcat
     if query == 'HathiTrust':
         return extend_values_HathiTrust
+    if query == 'OpenLibrary_Title':
+        return extend_values_OpenLibrary
 
 
     return None

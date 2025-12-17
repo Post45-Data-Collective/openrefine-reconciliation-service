@@ -35,6 +35,10 @@ manifest = {
       "name": "Title -- Wikidata Work"
     }, 
     {
+      "id": "OpenLibrary_Title",
+      "name": "Title -- Open Library Work"
+    },    
+    {
       "id": "VIAF_Personal",
       "name": "Name -- VIAF Personal"
     }
