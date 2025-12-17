@@ -29,7 +29,7 @@
 6. **Wikidata**
 7. **OpenLibrary**
 
-[Quick Start and Full Documentation](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki)
+[**Quick Start and Full Documentation**](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki)
 
 You can take a spreadsheet with only title and author information, and you can add identifiers like **ISBNs**, **OCLC numbers**, or **HathiTrust Volume IDs**, as well as valuable contextual information like Library of Congress **Subject Headings**, **genres**, **descriptions**, **page counts**, and **dates of first publicatio**n. Additionally, you can find and cluster different editions or manifestations of the same _Work_ (e.g., translations, reprints, etc.).
 
