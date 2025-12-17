@@ -183,7 +183,7 @@ def build_db(gzipped_file_path):
     print(f"Starting to read gzip file: {gzipped_file_path}")
     update_status("processing", f"Reading data from {gzipped_file_path}")
     try:
-        with gzip.open(gzipped_file_path, 'rt') as f:
+        with gzip.open(gzipped_file_path, 'rt', encoding='utf-8') as f:
             previous_ht_bib_key = None
             previous_record = None
             current_record=None
