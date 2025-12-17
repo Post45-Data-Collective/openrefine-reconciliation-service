@@ -5,9 +5,10 @@
 ---
 
 - [Installation](#installation)
-- [Usage](#usage)
-- [Customization](#customization)
+- [Basic Usage](#basic-usage)
+- [Full Documentation](#full-documentation)
 - [Credit & Citation](#credit--citation)
+- [Acknowledgments](#acknowledgments)
 
 ---
 
@@ -28,7 +29,7 @@
 6. **Wikidata**
 7. **OpenLibrary**
 
-[Quick Start and Documentation](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki)
+[Quick Start and Full Documentation](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki)
 
 You can take a spreadsheet with only title and author information, and you can add identifiers like **ISBNs**, **OCLC numbers**, or **HathiTrust Volume IDs**, as well as valuable contextual information like Library of Congress **Subject Headings**, **genres**, **descriptions**, **page counts**, and **dates of first publicatio**n. Additionally, you can find and cluster different editions or manifestations of the same _Work_ (e.g., translations, reprints, etc.).
 
@@ -189,7 +190,7 @@ When it starts, the service will be available at:
 
 ---
 
-# Usage
+# Basic Usage
 
 1. Open your dataset/project in OpenRefine.
 2. Click a column you want to reconcile—for example, the book "title" column.
@@ -218,51 +219,10 @@ When it starts, the service will be available at:
 
 ---
 
-# Customization
+# Full Documentation
 
-Open <http://127.0.0.1:5001/> to adjust how BookReconciler matches, clusters, and writes back data. No code editing required.
+For more details about all of the customization and configuration options that are available with BookrReconciler, more advanced usage instructions, and technical details, please see the [Full Documentation](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki) in our Wiki.
 
-### Book Title Matching
-
-- **Single Match Mode**  
-  Finds the _best single edition_ (manifestation) of a work.  
-  Good when you care about a specific edition (e.g., a 1950 reprint).  
-  Uses Title + Author (and Publication Year if available).
-
-- **Cluster Match Mode**  
-  Groups _all editions_ of the same **work** into a cluster (work-level).  
-  Best for gathering as many identifiers as possible or studying works across editions.
-
-### Extend Data Behavior (how identifiers are written back)
-
-- **Join Mode** — all identifiers in one cell, separated by a pipe `|`.  
-  Example:
-
-  ```
-  123456789 | 987654321 | 192837465 | 564738291
-  ```
-
-- **Row Mode** — each identifier in its own row.  
-  Example:
-  ```
-  123456789
-  987654321
-  192837465
-  564738291
-  ```
-
-### Remove Subtitle from Titles
-
-- **Keep Subtitles** — Titles remain as-is (e.g., _Moby-Dick: or, The Whale_).
-- **Remove Subtitles** — Attempts to strip subtitles (e.g., _Moby-Dick_).
-
----
-
-## Optional: OCLC / WorldCat API Keys
-
-If you plan to use OCLC’s protected endpoints, you can input your API keys on the configuration page.
-
----
 
 ## Credit & Citation
 
