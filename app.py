@@ -29,24 +29,34 @@ from lib.paths import get_hathi_data_dir, CACHE_DIR
 
 import json
 import os
+import sys
 import pathlib
 from html import escape
 
 
 
- 
+# PyInstaller creates a temp folder and stores path in _MEIPASS
+def get_base_path():
+    if getattr(sys, 'frozen', False):
+        return sys._MEIPASS
+    return os.path.dirname(os.path.abspath(__file__))
+
+base_path = get_base_path()
+
 # if the oclc keys are available as env vars
-OCLC_CLIENT_ID = os.environ.get('OCLC_CLIENT_ID', None) 
-OCLC_SECRET = os.environ.get('OCLC_SECRET', None) 
+OCLC_CLIENT_ID = os.environ.get('OCLC_CLIENT_ID', None)
+OCLC_SECRET = os.environ.get('OCLC_SECRET', None)
 OCLC_KEYS_SET_VIA_ENV = False
 
 if OCLC_CLIENT_ID != None or OCLC_SECRET != None:
     OCLC_KEYS_SET_VIA_ENV = True
-    
+
 HATHI_FULL_SEARCH_ONLY = False
 
 
-app = Flask(__name__)
+app = Flask(__name__,
+            template_folder=os.path.join(base_path, 'templates'),
+            static_folder=os.path.join(base_path, 'static'))
 app.config['DEBUG'] = True 
 
 app.config.update(
@@ -1088,6 +1098,18 @@ import shutil
 # except:
 #     print('error rm')
 #     pass
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    """Endpoint to shutdown the Flask server from Electron"""
+    if os.environ.get('RUNNING_IN_ELECTRON') == 'true':
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        func()
+        return jsonify({'status': 'shutdown'}), 200
+    else:
+        return jsonify({'error': 'Shutdown only available in Electron mode'}), 403
 
 try:
     pathlib.Path(CACHE_DIR).mkdir(parents=True, exist_ok=True)

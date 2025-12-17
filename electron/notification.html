@@ -2,8 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>BookReconciler</title>
+    <title>BookReconciler Control Panel</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             background: #f5f5f5;
             display: flex;
@@ -12,44 +15,202 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             height: 100vh;
-        }
-        .container {
-            text-align: center;
             padding: 20px;
         }
-        h2 {
-            margin: 0 0 10px 0;
-            color: #333;
-        }
-        .info {
-            color: #666;
-            margin: 10px 0;
-        }
-        .url {
+        .container {
             background: white;
-            padding: 10px;
-            border-radius: 4px;
-            font-family: monospace;
-            color: #0066cc;
-            margin: 10px 0;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
         }
-        .hint {
-            color: #999;
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #d4edda;
+            color: #155724;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        h1 {
+            margin: 10px 0;
+            color: #333;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        .section-title {
+            font-weight: 600;
+            color: #555;
             font-size: 13px;
-            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .url-box {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #0066cc;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .url-box:hover {
+            background: #e9ecef;
+            border-color: #0066cc;
+        }
+        .url-box:active {
+            transform: scale(0.98);
+        }
+        .copy-hint {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .warning-box strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .warning-box p {
+            color: #856404;
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .stop-button {
+            width: 100%;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+        .stop-button:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+        .stop-button:active {
+            transform: translateY(0);
+        }
+        .copied-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .copied-notification.show {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2> Success: BookReconciler 📘💎 is running.</h2>
-        <p class="info">You can configure BookReconciler at this URL:</p>
-        <p class="url">http://127.0.0.1:5001</p>
-        <p class="info">To use BookReconciler with OpenRefine, you will need to add a Reconciliation Service to OpenRefine by copying and pasting this URL:</p>
-        <p class="url">http://127.0.0.1:5001/api/v1/reconcile</p>
-        <p class="info">BookReconciler will only work while this app is running.</p>
+        <div class="header">
+            <div class="status">
+                <span class="status-dot"></span>
+                Server Running
+            </div>
+            <h1>📘 BookReconciler</h1>
+            <p class="subtitle">Control Panel</p>
+        </div>
 
-        <p class="hint">🛑 To stop BookReconciler, simply close this window.</p>
+        <div class="section">
+            <div class="section-title">Configuration URL</div>
+            <div class="url-box" onclick="copyToClipboard('http://127.0.0.1:5001')" title="Click to copy">
+                http://127.0.0.1:5001
+            </div>
+            <div class="copy-hint">👆 Click to copy</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">OpenRefine Reconciliation URL</div>
+            <div class="url-box" onclick="copyToClipboard('http://127.0.0.1:5001/api/v1/reconcile')" title="Click to copy">
+                http://127.0.0.1:5001/api/v1/reconcile
+            </div>
+            <div class="copy-hint">👆 Click to copy and paste into OpenRefine</div>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Keep This Window Open</strong>
+            <p>BookReconciler will stop working if you close this window. Minimize it instead if you want it out of the way.</p>
+        </div>
+
+        <button class="stop-button" onclick="stopServer()">
+            🛑 Stop BookReconciler
+        </button>
     </div>
+
+    <div class="copied-notification" id="copiedNotification">
+        ✓ Copied to clipboard!
+    </div>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const notification = document.getElementById('copiedNotification');
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            });
+        }
+
+        function stopServer() {
+            if (confirm('Are you sure you want to stop BookReconciler?\n\nThis will end your reconciliation session.')) {
+                window.close();
+            }
+        }
+    </script>
 </body>
 </html>

@@ -263,11 +263,7 @@ If you plan to use OCLC’s protected endpoints, you can input your API keys on 
 
 ## Credit & Citation
 
-This code is primarily written by Matt Miller, with contributions from Melanie Walsh. This project is supported by the [Post45 Data Collective](https://data.post45.org/), a repository for cultural data from 1945 to the present. The code is licensed under the **MIT License** (see [`LICENSE`](LICENSE) for details).
-
-This project was initially supported by a grant from the National Endowment for the Humanities (NEH), ["Post45 Data Collective: Enhancing Cultural Data Documentation, Interoperability, and Reach,"](https://apps.neh.gov/publicquery/AwardDetail.aspx?gn=HAA-301046-24) and led by co-PIs Dan Sinykin and Melanie Walsh. The grant was slated to run from 2024-2026, but it was sadly and abruptly cancelled in spring 2025.
-
-If you use this tool, we'd love to hear from you! You can fill out [this Google Form](https://forms.gle/akbcCGiLvCaDcpWAA) or email us.
+This code is primarily written by Matt Miller, with contributions from Melanie Walsh and input from Dan Sinykin. This project is supported by the [Post45 Data Collective](https://data.post45.org/), a repository for cultural data from 1945 to the present. The code is licensed under the **MIT License** (see [`LICENSE`](LICENSE) for details).
 
 If you use this tool as part of a publication, you can credit us by citing the following paper:
 
@@ -288,7 +284,13 @@ BibTeX Citation:
 }
 ```
 
----
+If you use this tool at all, we'd love to hear from you! You can fill out [this Google Form](https://forms.gle/akbcCGiLvCaDcpWAA) or email us.
+
+## Acknowledgments
+
+This project was initially supported by a grant from the National Endowment for the Humanities (NEH), ["Post45 Data Collective: Enhancing Cultural Data Documentation, Interoperability, and Reach,"](https://apps.neh.gov/publicquery/AwardDetail.aspx?gn=HAA-301046-24) and led by co-PIs Dan Sinykin and Melanie Walsh. The grant was slated to run from 2024-2026, but it was [abruptly cancelled](https://www.npr.org/2025/08/07/nx-s1-5495365/neh-national-endowment-for-the-humanities-lawsuit) in spring 2025.
+
+We are grateful to the Post45 Data Collective editorial board and to Juan Pablo Albornoz, Jen Doty, Sanghoon Oh, and Teddy Roland for early testing and feedback.
 
 ## Contributing
 

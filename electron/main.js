@@ -177,21 +177,46 @@ app.whenReady().then(async () => {
 
     // Show a notification window
     const notifWindow = new BrowserWindow({
-      width: 600,
-      height: 400,
+      width: 550,
+      height: 650,
       resizable: true,
       minimizable: true,
       maximizable: true,
       alwaysOnTop: false,
       frame: true,
+      title: 'BookReconciler Control Panel',
       icon: path.join(__dirname, process.platform === 'darwin' ? 'icon.icns' : 'icon.ico')
     });
 
     notifWindow.loadFile(path.join(__dirname, 'notification.html'));
 
+    // Prevent closing without confirmation
+    notifWindow.on('close', (e) => {
+      const choice = dialog.showMessageBoxSync(notifWindow, {
+        type: 'question',
+        buttons: ['Cancel', 'Stop Server'],
+        title: 'Stop BookReconciler?',
+        message: 'Are you sure you want to stop BookReconciler?',
+        detail: 'This will shut down the server and end your reconciliation session.',
+        defaultId: 0,
+        cancelId: 0
+      });
+
+      if (choice === 0) {
+        // User clicked Cancel
+        e.preventDefault();
+      }
+      // If choice === 1 (Stop Server), allow the window to close
+    });
+
     notifWindow.on('closed', () => {
       app.quit();
     });
+
+    // Auto-minimize window after 2 seconds
+    setTimeout(() => {
+      notifWindow.minimize();
+    }, 2000);
 
     mainWindow = notifWindow;
 
