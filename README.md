@@ -1,4 +1,4 @@
-![build passes](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/actions/workflows/python-app.yml/badge.svg)
+[![build passes](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/actions/workflows/python-app.yml/badge.svg)](https://github.com/Post45-Data-Collective/BookReconciler/actions/workflows/python-app.yml)
 
 # BookReconciler 📘💎 — Metadata Enrichment and Work-Level Clustering
 
