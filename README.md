@@ -2,7 +2,11 @@
 
 # BookReconciler 📘💎 — Metadata Enrichment and Work-Level Clustering
 
+- **Who is this for?** Digital humanities researchers, librarians, metadata specialists, and more.
+- **What does it do?** Finds, clusters, and enriches records for books. Adding ISBNS, HathiTrust IDs, subject headings, descriptions, page counts, publication dates, and more.
+
 ---
+Table of Contents:
 
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
@@ -11,9 +15,6 @@
 - [Acknowledgments](#acknowledgments)
 
 ---
-
-- **Who is this for?** Digital humanities researchers, librarians, metadata specialists, and more.
-- **What does it do?** Finds, clusters, and enriches records for books. Adding ISBNS, HathiTrust IDs, subject headings, descriptions, page counts, publication dates, and more.
 
 [![Watch the video](https://img.shields.io/badge/YouTube-Watch%20Demo-red?logo=youtube)](https://youtu.be/V9ZJoFowRJM)
 
@@ -29,9 +30,25 @@
 6. **Wikidata**
 7. **OpenLibrary**
 
-[**Quick Start and Full Documentation**](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki)
-Download sample data (20 rows): [CSV](sample-data/BookReconciler_sample_major_literary_prizes-winners_judges%20-%20Sheet1.csv) | [Google Sheet](https://docs.google.com/spreadsheets/d/1aruL4Wx2kSIjJ6PYCo60kt0I_E2glJ1IMNjHecDkPdg/edit?usp=sharing)
-Data drawn from: Claire Grossman, Juliana Spahr, and Stephanie Young. 2022. “The Index of Major Literary Prizes in the US.” Post45 Data Collective, December. https://doi.org/10.18737/CNJV1733p4520221212.
+<table>
+<tr>
+<td width="100%" bgcolor="#8cc0f5">
+
+### 🚀 Quick Start
+
+👉 **[Read the full documentation →](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki)**  
+📄 **[Download sample data (20 rows)](sample-data/BookReconciler_sample_major_literary_prizes-winners_judges%20-%20Sheet1.csv)** **[Google Sheet](https://docs.google.com/spreadsheets/d/1aruL4Wx2kSIjJ6PYCo60kt0I_E2glJ1IMNjHecDkPdg/edit?usp=sharing)**
+
+<sub>
+<strong>Sample data source:</strong>  
+Claire Grossman, Juliana Spahr, and Stephanie Young. 2022.  
+<em>“The Index of Major Literary Prizes in the US.”</em> Post45 Data Collective.  
+https://doi.org/10.18737/CNJV1733p4520221212
+</sub>
+
+</td>
+</tr>
+</table>
 
 You can take a spreadsheet with only title and author information, and you can add identifiers like **ISBNs**, **OCLC numbers**, or **HathiTrust Volume IDs**, as well as valuable contextual information like Library of Congress **Subject Headings**, **genres**, **descriptions**, **page counts**, and **dates of first publicatio**n. Additionally, you can find and cluster different editions or manifestations of the same _Work_ (e.g., translations, reprints, etc.).
 
