@@ -6,7 +6,7 @@
 - **What does it do?** Finds, clusters, and enriches records for books. Adding ISBNS, HathiTrust IDs, subject headings, descriptions, page counts, publication dates, and more.
 
 ---
-Table of Contents:
+### Table of Contents:
 
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
@@ -30,26 +30,6 @@ Table of Contents:
 6. **Wikidata**
 7. **OpenLibrary**
 
-<table>
-<tr>
-<td width="100%" bgcolor="#8cc0f5">
-
-### 🚀 Quick Start
-
-👉 **[Read the full documentation →](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki)**  
-📄 **[Download sample data (20 rows)](sample-data/BookReconciler_sample_major_literary_prizes-winners_judges%20-%20Sheet1.csv)** **[Google Sheet](https://docs.google.com/spreadsheets/d/1aruL4Wx2kSIjJ6PYCo60kt0I_E2glJ1IMNjHecDkPdg/edit?usp=sharing)**
-
-<sub>
-<strong>Sample data source:</strong>  
-Claire Grossman, Juliana Spahr, and Stephanie Young. 2022.  
-<em>“The Index of Major Literary Prizes in the US.”</em> Post45 Data Collective.  
-https://doi.org/10.18737/CNJV1733p4520221212
-</sub>
-
-</td>
-</tr>
-</table>
-
 You can take a spreadsheet with only title and author information, and you can add identifiers like **ISBNs**, **OCLC numbers**, or **HathiTrust Volume IDs**, as well as valuable contextual information like Library of Congress **Subject Headings**, **genres**, **descriptions**, **page counts**, and **dates of first publicatio**n. Additionally, you can find and cluster different editions or manifestations of the same _Work_ (e.g., translations, reprints, etc.).
 
 ![](images/bookreconociler-logo-ps-white.png)
@@ -58,7 +38,27 @@ The tool currently works as an extension of the software application **[OpenRefi
 
 The tool can also serve as a **bridge to computational text analysis**. A HathiTrust Volume ID can be used to computationally access the full text (for public domain works) or "bags of words" (for in-copyright works) for any text that is held by the HathiTrust Digital Library. This enable users to move from metadata to full computational text analysis. To learn more about accessing full text with Volume IDs, see the [HathiTrust Feature Reader](https://github.com/htrc/htrc-feature-reader?tab=readme-ov-file#usage) Python package.
 
-Watch a YouTube demo/tutorial video of BookReconciler here: https://youtu.be/V9ZJoFowRJM
+<table>
+<tr>
+<td width="100%" bgcolor="#8cc0f5">
+
+### 🚀 Quick Start
+
+👉 **[Read the full documentation →](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki)**  
+📄 **[Download sample data (20 rows)](sample-data/BookReconciler_sample_major_literary_prizes-winners_judges%20-%20Sheet1.csv)** // **[Google Sheet](https://docs.google.com/spreadsheets/d/1aruL4Wx2kSIjJ6PYCo60kt0I_E2glJ1IMNjHecDkPdg/edit?usp=sharing)**  
+🎥 **[Watch a tutorial/demo](https://youtu.be/V9ZJoFowRJM)**
+
+<sub>
+<strong>Sample data source:</strong>  
+Claire Grossman, Juliana Spahr, and Stephanie Young. 2022.  
+“The Index of Major Literary Prizes in the US.” Post45 Data Collective.  
+https://doi.org/10.18737/CNJV1733p4520221212
+<br>
+</sub>
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -240,17 +240,19 @@ When it starts, the service will be available at:
 
 # Full Documentation
 
-For more details about all of the customization and configuration options that are available with BookrReconciler, more advanced usage instructions, and technical details, please see the [Full Documentation](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki) in our Wiki.
+For more details about all of the customization and configuration options that are available with BookReconciler, more advanced usage instructions, and technical details, please see the [Full Documentation](https://github.com/Post45-Data-Collective/openrefine-reconciliation-service/wiki) in our Wiki.
+
+---
 
 # Credit & Citation
 
-This code is primarily written by Matt Miller, with contributions from Melanie Walsh and input from Dan Sinykin. This project is supported by the [Post45 Data Collective](https://data.post45.org/), a repository for cultural data from 1945 to the present. The code is licensed under the **MIT License** (see [`LICENSE`](LICENSE) for details).
+This code is primarily written by Matt Miller, with contributions from Melanie Walsh and input from Dan Sinykin. The project is supported by the [Post45 Data Collective](https://data.post45.org/). The code is licensed under the [MIT License](LICENSE).
 
 If you use this tool as part of a publication, you can credit us by citing the following paper:
 
-[BookReconciler📘💎: An Open-Source Tool for Metadata Enrichment and Work-Level Clustering](https://arxiv.org/abs/2512.10165).
+["BookReconciler📘💎: An Open-Source Tool for Metadata Enrichment and Work-Level Clustering"](https://arxiv.org/abs/2512.10165).
 Matt Miller, Dan Sinykin, and Melanie Walsh.
-_Joint Conference on Digital Libraries_, Resources Track.
+_Joint Conference on Digital Libraries_.
 
 BibTeX Citation:
 
@@ -267,11 +269,15 @@ BibTeX Citation:
 
 If you use this tool at all, we'd love to hear from you! You can fill out [this Google Form](https://forms.gle/akbcCGiLvCaDcpWAA) or email us.
 
+---
+
 # Acknowledgments
 
 This project was initially supported by a grant from the National Endowment for the Humanities (NEH), ["Post45 Data Collective: Enhancing Cultural Data Documentation, Interoperability, and Reach,"](https://apps.neh.gov/publicquery/AwardDetail.aspx?gn=HAA-301046-24) and led by co-PIs Dan Sinykin and Melanie Walsh. The grant was slated to run from 2024-2026, but it was [abruptly cancelled](https://www.npr.org/2025/08/07/nx-s1-5495365/neh-national-endowment-for-the-humanities-lawsuit) in spring 2025.
 
 We are grateful to the Post45 Data Collective editorial board and to Juan Pablo Albornoz, Jen Doty, Sanghoon Oh, and Teddy Roland for early testing and feedback.
+
+---
 
 # Contributing
 
