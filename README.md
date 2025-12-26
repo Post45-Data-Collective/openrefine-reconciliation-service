@@ -252,7 +252,7 @@ If you use this tool as part of a publication, you can credit us by citing the f
 
 ["BookReconciler📘💎: An Open-Source Tool for Metadata Enrichment and Work-Level Clustering"](https://arxiv.org/abs/2512.10165).
 Matt Miller, Dan Sinykin, and Melanie Walsh.
-_Joint Conference on Digital Libraries_.
+_Joint Conference on Digital Libraries_. December 2025.
 
 BibTeX Citation:
 
